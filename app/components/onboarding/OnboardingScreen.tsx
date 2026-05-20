@@ -26,10 +26,13 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
   const [name, setName]         = useState('')
   const [password, setPassword] = useState('')
 
-  const canSubmit = name.trim().length > 0
+  const canSubmit = name.trim().length >= 2
 
   const handleSubmit = () => {
-    if (canSubmit) onSubmit(name.trim())
+    if (!canSubmit) return
+    const trimmed = name.trim()
+    // Auto-capitalize the first letter — proper names get a capital.
+    onSubmit(trimmed.charAt(0).toUpperCase() + trimmed.slice(1))
   }
 
   return (

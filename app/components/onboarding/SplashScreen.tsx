@@ -61,12 +61,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         }}
       />
 
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
         <span
           style={{
-            fontSize: 18,
-            fontWeight: 600,
+            fontSize: 32,
+            fontWeight: 700,
             color: '#000000',
+            letterSpacing: '-1px',
             fontFamily: 'inherit',
             userSelect: 'none',
           }}
@@ -75,10 +76,10 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         </span>
         <span
           style={{
-            fontSize: 36,
-            fontWeight: 700,
-            color: '#000000',
-            letterSpacing: '-2px',
+            fontSize: 18,
+            fontWeight: 400,
+            color: '#666666',
+            letterSpacing: '-0.2px',
             fontFamily: 'inherit',
             userSelect: 'none',
           }}

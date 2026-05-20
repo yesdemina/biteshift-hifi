@@ -19,7 +19,7 @@ export const hygieneData = {
   plaque: 2,
   gumCare: 1,
   insight:
-    'Focus on brushing the inner side of your lower right canines this week',
+    'focus on brushing the inner side of your lower right canines this week',
 }
 
 // Tab 2 — Tooth Detail
@@ -81,9 +81,9 @@ export interface ReminderCard {
   action: string
 }
 export const reminderCards: ReminderCard[] = [
-  { id: 'tip', text: 'Your scanner tip is 3 months old — reorder?', action: 'Order' },
-  { id: 'brush', text: 'Toothbrush older than 3 months — time to refresh', action: 'Shop' },
-  { id: 'checkup', text: 'Orthodontist check-up in 2 weeks', action: 'Remind me' },
+  { id: 'tip', text: 'your scanner tip is 3 months old — reorder?', action: 'Order' },
+  { id: 'brush', text: 'toothbrush older than 3 months — time to refresh', action: 'Shop' },
+  { id: 'checkup', text: 'orthodontist check-up in 2 weeks', action: 'Remind me' },
 ]
 
 export const supplies = [

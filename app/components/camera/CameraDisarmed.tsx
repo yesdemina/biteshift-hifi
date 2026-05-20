@@ -69,15 +69,6 @@ export default function CameraDisarmed({ onArm }: CameraDisarmedProps) {
             <rect x="3" y="9" width="26" height="19" rx="3" stroke="#666666" strokeWidth="1.5" />
             <circle cx="16" cy="18.5" r="6" stroke="#666666" strokeWidth="1.5" />
           </svg>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span
-              className="sleep-dot"
-              style={{ width: 6, height: 6, borderRadius: '50%', background: '#999999', display: 'block' }}
-            />
-            <span style={{ fontSize: 12, color: '#999999', fontWeight: 300 }}>
-              your bracket camera is asleep
-            </span>
-          </div>
         </div>
         {/* Caption */}
         <p style={{ fontSize: 12, color: '#999999', marginTop: 6, textAlign: 'center' }}>

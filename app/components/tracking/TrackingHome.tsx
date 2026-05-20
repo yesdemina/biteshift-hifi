@@ -1,31 +1,9 @@
 'use client'
 // Screen 1a — Tracking Home
-// Three flex regions: anchored top, vertically centered hero, anchored bottom.
+// Headline anchored top; hero · timeline · day line · cards centered as one group.
 
 import { useState, useRef } from 'react'
 import { trackingData } from '@/lib/mockData'
-
-// ── Pill ──────────────────────────────────────────────────────────────────────
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        background: '#FFD9E5',
-        borderRadius: 999,
-        padding: '5px 12px',
-        fontSize: 12,
-        color: '#000000',
-        fontWeight: 600,
-      }}
-    >
-      {children}
-    </div>
-  )
-}
 
 // ── Straight timeline ─────────────────────────────────────────────────────────
 
@@ -42,7 +20,7 @@ function Timeline() {
   }
 
   return (
-    <div style={{ width: '100%', padding: '0 24px', marginTop: 24 }}>
+    <div style={{ width: '100%', padding: '0 24px', marginTop: 16 }}>
       {/* Track */}
       <div
         ref={trackRef}
@@ -153,27 +131,37 @@ function StatCard({
 export default function TrackingHome() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
-      {/* ── TOP region ── */}
-      <div style={{ flexShrink: 0 }}>
-        <div style={{ padding: '14px 24px 0' }}>
-          <Pill>day {trackingData.dayOfTreatment} of treatment</Pill>
+      {/* ── Status pill + headline (anchored top) ── */}
+      <div style={{ flexShrink: 0, padding: '16px 24px 0' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: '#FFD9E5',
+            borderRadius: 999,
+            padding: '6px 14px',
+            fontSize: 12,
+            fontWeight: 500,
+            color: '#000000',
+          }}
+        >
+          day {trackingData.dayOfTreatment} of treatment
         </div>
-        <div style={{ padding: '12px 24px 0' }}>
-          <h1
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: '#000000',
-              letterSpacing: '-0.5px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            your smile in motion
-          </h1>
-        </div>
+        <h1
+          style={{
+            marginTop: 12,
+            fontSize: 20,
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '-0.5px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          your smile in motion
+        </h1>
       </div>
 
-      {/* ── CENTER region — vertically centered hero ── */}
+      {/* ── Centered content group: hero · timeline · day line · cards ── */}
       <div
         style={{
           flexGrow: 1,
@@ -181,6 +169,7 @@ export default function TrackingHome() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          width: '100%',
         }}
       >
         {/* User photo with soft pink glow */}
@@ -200,20 +189,11 @@ export default function TrackingHome() {
           />
         </div>
 
+        {/* Timeline */}
         <Timeline />
-      </div>
 
-      {/* ── DAY NUMBER region — its own band, centered between timeline and cards ── */}
-      <div
-        style={{
-          flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        {/* Day line — 16px below timeline */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 16 }}>
           <span style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.6px', lineHeight: 1 }}>
             day {trackingData.dayOfTreatment}
           </span>
@@ -221,12 +201,9 @@ export default function TrackingHome() {
             TODAY
           </span>
         </div>
-      </div>
 
-      {/* ── BOTTOM region — cards ── */}
-      <div style={{ flexShrink: 0, paddingBottom: 16 }}>
-        {/* Stat cards */}
-        <div style={{ display: 'flex', gap: 10, padding: '0 24px' }}>
+        {/* Stat cards — 24px below day line */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 24, width: '100%', padding: '0 24px' }}>
           <StatCard
             label="THIS WEEK"
             bigNumber={trackingData.weeklyMovement}

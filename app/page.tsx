@@ -275,7 +275,9 @@ export default function Home() {
       {appScreen === 'main' && (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar />
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          {/* paddingBottom reserves the floating tab bar's footprint so screen
+              content keeps the same usable height and never hides behind it */}
+          <div style={{ flex: 1, overflowY: 'auto', paddingBottom: showTabBar ? 72 : 0 }}>
             {renderContent()}
           </div>
           {showTabBar && (

@@ -1,5 +1,5 @@
-// TabBar — 4-tab bottom bar, flush to bottom of the PhoneFrame.
-// Bold line-art icons; the active tab sits in a soft gray pill.
+// TabBar — floating white pill at the bottom of the PhoneFrame.
+// Filled icons; the active tab sits in a soft-pink pill.
 
 export type Tab = 'tracking' | 'hygiene' | 'camera' | 'support'
 
@@ -8,50 +8,57 @@ interface TabBarProps {
   onTabChange: (tab: Tab) => void
 }
 
-// ── Bold line-art icons (Apple SF Symbol weight) ──────────────────────────────
+// ── Filled icons (currentColor — transitions via the parent svg color) ────────
 
-function ClockIcon({ color }: { color: string }) {
+function ClockIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <polyline points="12,7 12,12 15.5,14" />
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 4a1 1 0 10-2 0v6a1 1 0 00.293.707l3.5 3.5a1 1 0 001.414-1.414L13 11.586V6z"
+        fill="currentColor"
+      />
     </svg>
   )
 }
 
-function ToothIcon({ color }: { color: string }) {
+function ToothIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 3C6.5 3 5 5 5 7c0 1 .3 2 .6 3L7 18c.2 1 .7 2 2 2 .9 0 1.5-.6 2-.6.5 0 1.1.6 2 .6 1.3 0 1.8-1 2-2l1.4-8c.3-1 .6-2 .6-3 0-2-1.5-4-4-4-1.2 0-1.8.3-3 .3C10.8 3.3 10.2 3 9 3z" />
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path
+        d="M9 3C6.5 3 5 5 5 7c0 1 .3 2 .6 3L7 18c.2 1 .7 2 2 2 .9 0 1.5-.6 2-.6.5 0 1.1.6 2 .6 1.3 0 1.8-1 2-2l1.4-8c.3-1 .6-2 .6-3 0-2-1.5-4-4-4-1.2 0-1.8.3-3 .3C10.8 3.3 10.2 3 9 3z"
+        fill="currentColor"
+      />
     </svg>
   )
 }
 
-function CameraIcon({ color }: { color: string }) {
+function CameraIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-      <circle cx="12" cy="13" r="4" />
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9 2L7.5 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2h-3.5L15 2H9zm3 6a4.5 4.5 0 100 9 4.5 4.5 0 000-9z"
+        fill="currentColor"
+      />
     </svg>
   )
 }
 
-function PersonIcon({ color }: { color: string }) {
+function PersonIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" fill="currentColor" />
+      <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7a1 1 0 01-1 1H5a1 1 0 01-1-1z" fill="currentColor" />
     </svg>
   )
 }
 
 // ── Tab bar ───────────────────────────────────────────────────────────────────
 
-const TABS: { id: Tab; Icon: React.ComponentType<{ color: string }> }[] = [
+const TABS: { id: Tab; Icon: React.ComponentType }[] = [
   { id: 'tracking', Icon: ClockIcon },
   { id: 'hygiene',  Icon: ToothIcon },
   { id: 'camera',   Icon: CameraIcon },
@@ -62,12 +69,19 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
   return (
     <div
       style={{
-        height: 72,
-        flexShrink: 0,
+        position: 'absolute',
+        bottom: 16,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        height: 56,
         display: 'flex',
         alignItems: 'center',
-        borderTop: '0.5px solid rgba(0,0,0,0.06)',
+        gap: 8,
+        padding: '0 12px',
         background: '#FFFFFF',
+        border: '0.5px solid rgba(0,0,0,0.08)',
+        borderRadius: 999,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
       }}
     >
       {TABS.map(({ id, Icon }) => {
@@ -78,7 +92,8 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
             onClick={() => onTabChange(id)}
             aria-label={id}
             style={{
-              flex: 1,
+              width: 56,
+              height: 56,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -86,20 +101,30 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
               border: 'none',
               cursor: 'pointer',
               outline: 'none',
-              height: '100%',
+              padding: 0,
             }}
           >
             <div
               style={{
+                width: 56,
+                height: 40,
+                borderRadius: 999,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '8px 12px',
-                borderRadius: 12,
                 background: active ? '#F0F0F0' : 'transparent',
+                transition: 'background-color 200ms ease',
               }}
             >
-              <Icon color={active ? '#000000' : '#FFB3D1'} />
+              <span
+                style={{
+                  display: 'flex',
+                  color: active ? '#000000' : '#FFB3D1',
+                  transition: 'color 200ms ease',
+                }}
+              >
+                <Icon />
+              </span>
             </div>
           </button>
         )

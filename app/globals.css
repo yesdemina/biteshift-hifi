@@ -23,6 +23,11 @@
   font-display: swap;
 }
 
+/* Tailwind v4 theme — make font-sans (and the default font) use RF Dewi */
+@theme {
+  --font-sans: 'RF Dewi Extended', system-ui, sans-serif;
+}
+
 /* Force light mode — design prototype */
 :root {
   color-scheme: light;
@@ -177,4 +182,13 @@ body {
 }
 .scan-dot {
   animation: scanDotPulse 1.5s ease-in-out infinite;
+}
+
+/* Hygiene Home: pulsing scanner-ready circle */
+@keyframes scannerPulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.04); opacity: 0.92; }
+}
+.scanner-pulse {
+  animation: scannerPulse 2.4s ease-in-out infinite;
 }
