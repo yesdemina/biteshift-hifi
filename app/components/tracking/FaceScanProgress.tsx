@@ -52,10 +52,10 @@ export default function FaceScanProgress({ onComplete }: FaceScanProgressProps) 
       {/* Label */}
       <span
         style={{
-          fontSize: 28,
+          fontSize: 22,
           fontWeight: 700,
-          color: '#1A1A1A',
-          letterSpacing: '-0.8px',
+          color: '#000000',
+          letterSpacing: '-0.5px',
           fontFamily: 'inherit',
         }}
       >
@@ -66,9 +66,9 @@ export default function FaceScanProgress({ onComplete }: FaceScanProgressProps) 
       <div
         style={{
           width: 280,
-          height: 6,
-          background: '#E0E0E0',
-          borderRadius: 3,
+          height: 8,
+          background: '#F5F5F5',
+          borderRadius: 999,
           overflow: 'hidden',
         }}
       >
@@ -76,12 +76,18 @@ export default function FaceScanProgress({ onComplete }: FaceScanProgressProps) 
           style={{
             height: '100%',
             width: `${progress}%`,
-            background: '#404040',
-            borderRadius: 3,
+            background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 100%)',
+            borderRadius: 999,
             transition: `width ${TICK_MS}ms linear`,
           }}
         />
       </div>
+
+      {/* Pulsing pink dot */}
+      <div
+        className="scan-dot"
+        style={{ width: 12, height: 12, borderRadius: '50%', background: '#FFB3D1' }}
+      />
     </div>
   )
 }

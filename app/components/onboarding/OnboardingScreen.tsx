@@ -11,15 +11,15 @@ interface OnboardingScreenProps {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '12px 14px',
+  padding: '14px',
   fontSize: 16,
-  color: '#1A1A1A',
+  color: '#000000',
   background: '#FFFFFF',
-  border: '1px solid #E0E0E0',
-  borderRadius: 8,
+  borderRadius: 12,
   outline: 'none',
   fontFamily: 'inherit',
   boxSizing: 'border-box',
+  WebkitTapHighlightColor: 'transparent',
 }
 
 export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
@@ -44,8 +44,23 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
         justifyContent: 'center',
         padding: '0 40px',
         zIndex: 100,
+        overflow: 'hidden',
       }}
     >
+      {/* Iridescent gradient blob — subtle */}
+      <div
+        style={{
+          position: 'absolute',
+          width: 600,
+          height: 600,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)',
+          filter: 'blur(50px)',
+          opacity: 0.28,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Wordmark — pinned near top */}
       <span
         style={{
@@ -53,7 +68,7 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
           top: 52,
           fontSize: 14,
           fontWeight: 400,
-          color: '#666666',
+          color: '#999999',
           fontFamily: 'inherit',
           userSelect: 'none',
         }}
@@ -64,10 +79,10 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
       {/* Headline */}
       <h1
         style={{
-          fontSize: 40,
+          fontSize: 26,
           fontWeight: 700,
-          color: '#1A1A1A',
-          letterSpacing: '-1.5px',
+          color: '#000000',
+          letterSpacing: '-1px',
           marginBottom: 8,
           textAlign: 'center',
           fontFamily: 'inherit',
@@ -79,9 +94,9 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
       {/* Subtitle */}
       <p
         style={{
-          fontSize: 16,
-          color: '#666666',
-          marginBottom: 32,
+          fontSize: 13,
+          color: '#999999',
+          marginBottom: 28,
           textAlign: 'center',
         }}
       >
@@ -92,6 +107,7 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
       <div style={{ width: '100%', marginBottom: 12 }}>
         <input
           type="text"
+          className="field-input"
           placeholder="your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -105,6 +121,7 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
       <div style={{ width: '100%', marginBottom: 24 }}>
         <input
           type="password"
+          className="field-input"
           placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -120,14 +137,14 @@ export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
         style={{
           width: '100%',
           padding: '14px 0',
-          fontSize: 16,
+          fontSize: 13,
           fontWeight: 600,
           fontFamily: 'inherit',
           letterSpacing: '-0.2px',
-          background: canSubmit ? '#1A1A1A' : '#E0E0E0',
+          background: canSubmit ? '#000000' : '#E0E0E0',
           color: canSubmit ? '#FFFFFF' : '#999999',
           border: 'none',
-          borderRadius: 8,
+          borderRadius: 14,
           cursor: canSubmit ? 'pointer' : 'not-allowed',
           transition: 'background 0.15s, color 0.15s',
         }}

@@ -1,6 +1,6 @@
 // Screen 2a — Hygiene Home
+// Three flex regions: anchored top, vertically centered hero, anchored bottom.
 
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
 import { hygieneData } from '@/lib/mockData'
 
 interface HygieneHomeProps {
@@ -15,13 +15,12 @@ function Pill({ children }: { children: React.ReactNode }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        background: '#F5F5F5',
-        border: '1px solid #E0E0E0',
-        borderRadius: 20,
+        background: '#FFD9E5',
+        borderRadius: 999,
         padding: '5px 12px',
         fontSize: 12,
-        color: '#666666',
-        fontWeight: 500,
+        color: '#000000',
+        fontWeight: 600,
       }}
     >
       {children}
@@ -29,35 +28,33 @@ function Pill({ children }: { children: React.ReactNode }) {
   )
 }
 
-// Stat strip inside the summary card
-function StatStrip() {
+function SummaryCard() {
   const { clean, total, plaque, gumCare } = hygieneData
+  const items = [
+    { label: 'CLEAN',    value: `${clean}/${total}` },
+    { label: 'PLAQUE',   value: String(plaque) },
+    { label: 'GUM CARE', value: String(gumCare) },
+  ]
   return (
     <div
       style={{
-        background: '#F5F5F5',
-        border: '1px solid #E0E0E0',
-        borderRadius: 12,
+        background: 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)',
+        borderRadius: 20,
+        padding: 16,
         display: 'flex',
-        overflow: 'hidden',
       }}
     >
-      {[
-        { label: 'CLEAN',    value: `${clean}/${total}` },
-        { label: 'PLAQUE',   value: String(plaque) },
-        { label: 'GUM CARE', value: String(gumCare) },
-      ].map(({ label, value }, i) => (
+      {items.map(({ label, value }, i) => (
         <div
           key={label}
           style={{
             flex: 1,
-            padding: '14px 0',
             textAlign: 'center',
-            borderLeft: i === 0 ? 'none' : '1px solid #E0E0E0',
+            borderLeft: i === 0 ? 'none' : '0.5px solid rgba(0,0,0,0.08)',
           }}
         >
-          <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A' }}>{value}</div>
-          <div style={{ fontSize: 10, color: '#999999', marginTop: 2, letterSpacing: '0.5px', fontWeight: 600 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#000000' }}>{value}</div>
+          <div style={{ fontSize: 9, color: '#666666', marginTop: 3, letterSpacing: '0.5px', fontWeight: 600 }}>
             {label}
           </div>
         </div>
@@ -68,78 +65,97 @@ function StatStrip() {
 
 export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
-      {/* Top row */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <Pill>
-          <span
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
+      {/* ── TOP region ── */}
+      <div style={{ flexShrink: 0 }}>
+        <div style={{ padding: '14px 24px 0' }}>
+          <Pill>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#000000', display: 'inline-block' }} />
+            last scan · {hygieneData.lastScanDaysAgo} days ago
+          </Pill>
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <h1
             style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: '#999999',
-              display: 'inline-block',
+              fontSize: 20,
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '-0.5px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            your hygiene, mapped
+          </h1>
+        </div>
+      </div>
+
+      {/* ── CENTER region — vertically centered hero ── */}
+      <div
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 220, height: 160, borderRadius: '50%',
+              background: 'rgba(224,200,255,0.35)', filter: 'blur(55px)', pointerEvents: 'none',
             }}
           />
-          Last scan · {hygieneData.lastScanDaysAgo} days ago
-        </Pill>
+          <img
+            src="/teeth.png"
+            alt="Dental arch"
+            style={{ position: 'relative', width: 240, height: 'auto', display: 'block' }}
+          />
+        </div>
       </div>
 
-      {/* Headline */}
-      <div style={{ padding: '14px 24px 0' }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.2 }}>
-          Your hygiene,<br />mapped
-        </h1>
-      </div>
+      {/* ── BOTTOM region ── */}
+      <div style={{ flexShrink: 0, paddingBottom: 16 }}>
+        <div style={{ padding: '0 24px' }}>
+          <SummaryCard />
+        </div>
 
-      {/* Hero */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <HatchedPlaceholder
-          label="Last scan — 3D dental arch with color zones"
-          height={220}
-        />
-      </div>
+        <div style={{ padding: '14px 24px 0' }}>
+          <button
+            onClick={onStartScan}
+            style={{
+              width: '100%',
+              padding: '14px 0',
+              background: '#000000',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: 14,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            start new scan
+          </button>
+        </div>
 
-      {/* Stats */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <StatStrip />
-      </div>
-
-      {/* Start scan CTA */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <button
-          onClick={onStartScan}
-          style={{
-            width: '100%',
-            height: 52,
-            background: '#1A1A1A',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: 12,
-            fontSize: 16,
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Start new scan
-        </button>
-      </div>
-
-      {/* View history */}
-      <div style={{ padding: '14px 24px 0', textAlign: 'center' }}>
-        <button
-          onClick={onViewHistory}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: 13,
-            color: '#999999',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-          }}
-        >
-          View history
-        </button>
+        <div style={{ padding: '12px 24px 0', textAlign: 'center' }}>
+          <button
+            onClick={onViewHistory}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: 12,
+              color: '#999999',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+            }}
+          >
+            view history
+          </button>
+        </div>
       </div>
     </div>
   )

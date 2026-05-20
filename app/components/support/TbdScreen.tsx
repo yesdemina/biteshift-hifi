@@ -7,7 +7,7 @@ interface TbdScreenProps {
 
 export default function TbdScreen({ title, onBack }: TbdScreenProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
 
       {/* Back */}
       <div style={{ padding: '16px 24px 0' }}>
@@ -20,20 +20,20 @@ export default function TbdScreen({ title, onBack }: TbdScreenProps) {
             background: 'none',
             border:     'none',
             cursor:     'pointer',
-            color:      '#1A1A1A',
+            color:      '#000000',
             fontSize:   15,
             padding:    0,
           }}
         >
-          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+          <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          Back
+          back
         </button>
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', padding: '14px 24px 0' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px' }}>
         {title.toLowerCase()}
       </h1>
 
@@ -41,15 +41,14 @@ export default function TbdScreen({ title, onBack }: TbdScreenProps) {
       <div
         style={{
           margin:       '24px 24px 0',
-          background:   '#F5F5F5',
-          border:       '1px solid #E0E0E0',
-          borderRadius: 12,
+          background:   'linear-gradient(135deg, #FFD9E5 0%, #EFE0FF 50%, #E0EEEE 100%)',
+          borderRadius: 20,
           padding:      '32px 20px',
           textAlign:    'center',
         }}
       >
-        <p style={{ fontSize: 14, color: '#999999', lineHeight: 1.5, margin: 0 }}>
-          {title} settings coming soon.
+        <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.5, margin: 0 }}>
+          {title.toLowerCase()} settings coming soon.
         </p>
       </div>
 

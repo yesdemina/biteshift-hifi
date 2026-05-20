@@ -1,90 +1,91 @@
 // Screen 3a — Camera Disarmed (default state)
-// Tapping the toggle card OR any duration chip arms the camera → 3b.
+// Tapping the toggle row OR any duration chip arms the camera → 3b.
+
+import HowItWorks from '@/app/components/camera/HowItWorks'
 
 interface CameraDisarmedProps {
   onArm: (duration: string) => void
 }
 
-const CHIPS = ['Arm for 15 min', 'Arm for 1 hour', 'Arm until I turn off'] as const
+const CHIPS = ['arm for 15 min', 'arm for 1 hour', 'arm until I turn off'] as const
 
-// Pill toggle — OFF state (pure visual)
-function ToggleOff() {
+// Small pill toggle — OFF state
+function Toggle() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, pointerEvents: 'none' }}>
-      {/* Track */}
+    <div
+      style={{
+        width: 48,
+        height: 28,
+        borderRadius: 999,
+        background: '#E0E0E0',
+        position: 'relative',
+        flexShrink: 0,
+        pointerEvents: 'none',
+      }}
+    >
       <div
         style={{
-          width: 56,
-          height: 30,
-          borderRadius: 15,
-          background: '#E0E0E0',
-          position: 'relative',
-          flexShrink: 0,
+          position: 'absolute',
+          top: 3,
+          left: 3,
+          width: 22,
+          height: 22,
+          borderRadius: '50%',
+          background: '#FFFFFF',
+          boxShadow: '0 0 0 0.5px rgba(0,0,0,0.05)',
+          transition: 'left 0.2s ease',
         }}
-      >
-        {/* Thumb — left side = OFF */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 3,
-            left: 3,
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            background: '#FFFFFF',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-          }}
-        />
-      </div>
-      <span style={{ fontSize: 22, fontWeight: 800, color: '#AAAAAA', letterSpacing: '0.5px' }}>
-        DISARMED
-      </span>
+      />
     </div>
   )
 }
 
 export default function CameraDisarmed({ onArm }: CameraDisarmedProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 16, background: '#FFFFFF' }}>
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', padding: '16px 24px 0' }}>
-        Hands-free camera
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px' }}>
+        hands-free camera
       </h1>
 
       {/* Hero — sleeping camera visual */}
-      <div style={{ padding: '14px 24px 0' }}>
+      <div style={{ padding: '12px 24px 0' }}>
         <div
           style={{
-            width:          '100%',
-            aspectRatio:    '1 / 1',
-            background:     '#1A1A1A',
-            borderRadius:   12,
-            overflow:       'hidden',
-            display:        'flex',
-            flexDirection:  'column',
-            alignItems:     'center',
+            width: '100%',
+            aspectRatio: '1 / 1',
+            background: '#1A1A1A',
+            borderRadius: 12,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
-            gap:            12,
+            gap: 12,
           }}
         >
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect x="11" y="5" width="10" height="5" rx="1.5" stroke="#666666" strokeWidth="1.6" />
-            <rect x="3" y="9" width="26" height="19" rx="3" stroke="#666666" strokeWidth="1.6" />
-            <circle cx="16" cy="18.5" r="6" stroke="#666666" strokeWidth="1.6" />
+            <rect x="11" y="5" width="10" height="5" rx="1.5" stroke="#666666" strokeWidth="1.5" />
+            <rect x="3" y="9" width="26" height="19" rx="3" stroke="#666666" strokeWidth="1.5" />
+            <circle cx="16" cy="18.5" r="6" stroke="#666666" strokeWidth="1.5" />
           </svg>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span
               className="sleep-dot"
               style={{ width: 6, height: 6, borderRadius: '50%', background: '#999999', display: 'block' }}
             />
-            <span style={{ fontSize: 13, color: '#999999', fontWeight: 300 }}>
+            <span style={{ fontSize: 12, color: '#999999', fontWeight: 300 }}>
               your bracket camera is asleep
             </span>
           </div>
         </div>
+        {/* Caption */}
+        <p style={{ fontSize: 12, color: '#999999', marginTop: 6, textAlign: 'center' }}>
+          your camera is sleeping
+        </p>
       </div>
 
-      {/* ── Status card — entire card is clickable to arm ── */}
+      {/* Status row — clickable to arm */}
       <div
         role="button"
         tabIndex={0}
@@ -92,39 +93,37 @@ export default function CameraDisarmed({ onArm }: CameraDisarmedProps) {
         onClick={() => onArm('toggle')}
         onKeyDown={(e) => e.key === 'Enter' && onArm('toggle')}
         style={{
-          margin: '16px 24px 0',
-          background: '#F5F5F5',
-          border: '1px solid #E0E0E0',
-          borderRadius: 14,
-          padding: '18px 20px',
+          margin: '12px 24px 0',
+          height: 56,
+          background: '#FFFFFF',
+          border: '0.5px solid rgba(0,0,0,0.15)',
+          borderRadius: 20,
+          padding: '0 16px',
+          display: 'flex',
+          alignItems: 'center',
           cursor: 'pointer',
-          // Subtle press feedback via active pseudo-class is not possible inline;
-          // the cursor change gives sufficient affordance for a lo-fi prototype.
         }}
       >
-        <ToggleOff />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, pointerEvents: 'none' }}>
+          <Toggle />
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#000000', letterSpacing: '0.5px' }}>
+            DISARMED
+          </span>
+        </div>
       </div>
 
-      {/* Mechanics text */}
-      <div style={{ padding: '14px 24px 0' }}>
-        <p style={{ fontSize: 13, color: '#666666', lineHeight: 1.55 }}>
-          Arm the camera to capture hands-free.{' '}
-          <strong style={{ color: '#1A1A1A', fontWeight: 600 }}>Triple-click your teeth</strong>{' '}
-          for a photo.{' '}
-          <strong style={{ color: '#1A1A1A', fontWeight: 600 }}>Press and hold (bite 2s)</strong>{' '}
-          for video.
-        </p>
-      </div>
+      {/* How it works */}
+      <HowItWorks />
 
       {/* Duration chip row */}
-      <div style={{ padding: '16px 24px 0' }}>
+      <div style={{ padding: '14px 24px 0' }}>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 9,
             color: '#999999',
             fontWeight: 600,
             letterSpacing: '0.5px',
-            marginBottom: 10,
+            marginBottom: 8,
           }}
         >
           ARM FOR
@@ -135,13 +134,13 @@ export default function CameraDisarmed({ onArm }: CameraDisarmedProps) {
               key={chip}
               onClick={() => onArm(chip)}
               style={{
-                padding: '9px 14px',
-                background: '#FFFFFF',
-                border: '1px solid #C8C8C8',
-                borderRadius: 20,
-                fontSize: 13,
-                color: '#1A1A1A',
-                fontWeight: 500,
+                padding: '7px 13px',
+                background: '#FFD9E5',
+                border: 'none',
+                borderRadius: 999,
+                fontSize: 12,
+                color: '#000000',
+                fontWeight: 600,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
               }}

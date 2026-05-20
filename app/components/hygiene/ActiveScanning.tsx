@@ -3,7 +3,6 @@
 // No tab bar. Progress bar auto-fills over ~6 seconds then calls onComplete.
 
 import { useState, useEffect, useRef } from 'react'
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
 
 interface ActiveScanningProps {
   onClose: () => void
@@ -26,7 +25,6 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
       setProgress(Math.min((current / STEPS) * 100, 100))
       if (current >= STEPS) {
         clearInterval(id)
-        // Brief pause then advance
         setTimeout(() => onCompleteRef.current(), 400)
       }
     }, INTERVAL_MS)
@@ -34,7 +32,6 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
     return () => clearInterval(id)
   }, [])
 
-  // Elapsed time display: 0:00 → 1:00 proportionally
   const elapsedSeconds = Math.round((progress / 100) * 60)
   const timeLabel = `0:${String(elapsedSeconds).padStart(2, '0')}`
 
@@ -45,6 +42,7 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
         flexDirection: 'column',
         height: '100%',
         padding: '0 24px',
+        background: '#FFFFFF',
       }}
     >
       {/* Close button row */}
@@ -56,13 +54,13 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
             height: 36,
             borderRadius: '50%',
             background: '#F5F5F5',
-            border: '1px solid #E0E0E0',
+            border: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             fontSize: 18,
-            color: '#1A1A1A',
+            color: '#999999',
           }}
           aria-label="Close scanner"
         >
@@ -71,11 +69,11 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', marginTop: 12 }}>
-        Hold steady
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', marginTop: 12, letterSpacing: '-0.4px' }}>
+        hold steady
       </h1>
 
-      {/* Large hero circle — scanner preview */}
+      {/* Large square hero — scanner preview */}
       <div
         style={{
           flex: 1,
@@ -86,17 +84,51 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
           paddingBottom: 8,
         }}
       >
-        <HatchedPlaceholder
-          label="Live scanner preview"
-          circle
-          width={280}
-          height={280}
-        />
+        <div
+          style={{
+            position: 'relative',
+            width: 280,
+            height: 280,
+            borderRadius: 20,
+            background: '#FFFFFF',
+            border: '1px solid #F0F0F0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 200,
+              height: 200,
+              borderRadius: '50%',
+              background:
+                'radial-gradient(circle, rgba(255,179,209,0.35) 0%, rgba(224,200,255,0.25) 55%, transparent 100%)',
+              filter: 'blur(30px)',
+              pointerEvents: 'none',
+            }}
+          />
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style={{ position: 'relative' }}>
+            <rect x="13" y="6" width="14" height="6" rx="2" stroke="#999999" strokeWidth="1.8" />
+            <rect x="4" y="11" width="32" height="24" rx="4" stroke="#999999" strokeWidth="1.8" />
+            <circle cx="20" cy="23" r="7" stroke="#999999" strokeWidth="1.8" />
+          </svg>
+          <span style={{ position: 'relative', fontSize: 12, color: '#999999' }}>
+            live scanner preview
+          </span>
+        </div>
       </div>
 
       {/* Subtitle */}
-      <p style={{ fontSize: 14, color: '#666666', textAlign: 'center', marginBottom: 16 }}>
-        Move slowly along your upper arch
+      <p style={{ fontSize: 12, color: '#999999', textAlign: 'center', marginBottom: 16 }}>
+        move slowly along your upper arch
       </p>
 
       {/* Progress bar + time */}
@@ -115,9 +147,9 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
         </div>
         <div
           style={{
-            height: 4,
-            background: '#E0E0E0',
-            borderRadius: 2,
+            height: 8,
+            background: '#F5F5F5',
+            borderRadius: 999,
             overflow: 'hidden',
           }}
         >
@@ -125,8 +157,8 @@ export default function ActiveScanning({ onClose, onComplete }: ActiveScanningPr
             style={{
               height: '100%',
               width: `${progress}%`,
-              background: '#1A1A1A',
-              borderRadius: 2,
+              background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 100%)',
+              borderRadius: 999,
               transition: 'width 80ms linear',
             }}
           />

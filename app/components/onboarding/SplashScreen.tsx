@@ -44,16 +44,30 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 100,
+        overflow: 'hidden',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+      {/* Iridescent gradient blob */}
+      <div
+        style={{
+          position: 'absolute',
+          width: 600,
+          height: 600,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)',
+          filter: 'blur(40px)',
+          opacity: 0.5,
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
         <span
           style={{
-            fontSize: 28,
-            fontWeight: 400,
-            color: '#1A1A1A',
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+            fontSize: 18,
+            fontWeight: 600,
+            color: '#000000',
+            fontFamily: 'inherit',
             userSelect: 'none',
           }}
         >
@@ -61,12 +75,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         </span>
         <span
           style={{
-            fontSize: 48,
+            fontSize: 36,
             fontWeight: 700,
-            color: '#1A1A1A',
-            letterSpacing: '-2.5px',
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+            color: '#000000',
+            letterSpacing: '-2px',
+            fontFamily: 'inherit',
             userSelect: 'none',
           }}
         >

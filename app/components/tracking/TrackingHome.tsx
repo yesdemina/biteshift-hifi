@@ -1,12 +1,11 @@
 'use client'
 // Screen 1a — Tracking Home
-// Timeline scrubber "Today" dot is now a draggable handle (pointer events + setPointerCapture).
+// Three flex regions: anchored top, vertically centered hero, anchored bottom.
 
 import { useState, useRef } from 'react'
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
 import { trackingData } from '@/lib/mockData'
 
-// ── Shared micro-components ───────────────────────────────────────────────────
+// ── Pill ──────────────────────────────────────────────────────────────────────
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
@@ -15,13 +14,12 @@ function Pill({ children }: { children: React.ReactNode }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        background: '#F5F5F5',
-        border: '1px solid #E0E0E0',
-        borderRadius: 20,
+        background: '#FFD9E5',
+        borderRadius: 999,
         padding: '5px 12px',
         fontSize: 12,
-        color: '#666666',
-        fontWeight: 500,
+        color: '#000000',
+        fontWeight: 600,
       }}
     >
       {children}
@@ -29,89 +27,48 @@ function Pill({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ── Draggable timeline scrubber ───────────────────────────────────────────────
+// ── Straight timeline ─────────────────────────────────────────────────────────
 
-function TimelineScrubber() {
-  // todayPct = how far along the track the "Today" handle sits (0 = Day 0, 100 = Forecast)
-  const [todayPct, setTodayPct]   = useState(50)
-  const [dragging, setDragging]   = useState(false)
-  const isDragging                = useRef(false)   // ref for sync reads inside handlers
-  const trackRef                  = useRef<HTMLDivElement>(null)
+function Timeline() {
+  const [pct, setPct] = useState(50)
+  const [dragging, setDragging] = useState(false)
+  const isDragging = useRef(false)
+  const trackRef = useRef<HTMLDivElement>(null)
 
-  /** Convert a clientX pixel position into a clamped 0-100 percentage. */
   const pctFromClientX = (clientX: number): number => {
-    if (!trackRef.current) return todayPct
+    if (!trackRef.current) return pct
     const { left, width } = trackRef.current.getBoundingClientRect()
     return Math.max(0, Math.min(100, ((clientX - left) / width) * 100))
   }
 
   return (
-    <div style={{ padding: '0 24px', marginTop: 20 }}>
-      {/* ── Track ── */}
+    <div style={{ width: '100%', padding: '0 24px', marginTop: 24 }}>
+      {/* Track */}
       <div
         ref={trackRef}
-        style={{
-          position: 'relative',
-          height: 4,
-          background: '#E0E0E0',
-          borderRadius: 2,
-          // Allow clicking anywhere on track to jump the handle
-          cursor: 'pointer',
-        }}
-        onClick={(e) => {
-          // Only move on direct track click, not when the click comes from the handle
-          if ((e.target as HTMLElement) === trackRef.current) {
-            setTodayPct(pctFromClientX(e.clientX))
-          }
-        }}
+        style={{ position: 'relative', height: 16, display: 'flex', alignItems: 'center' }}
       >
-        {/* Filled segment — left edge → Today handle */}
+        <div style={{ width: '100%', height: 1.5, background: '#FFB3D1', borderRadius: 999 }} />
+
         <div
           style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            height: '100%',
-            width: `${todayPct}%`,
-            background: '#404040',
-            borderRadius: 2,
-            pointerEvents: 'none',
+            position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)',
+            width: 8, height: 8, borderRadius: '50%', background: '#FFB3D1', pointerEvents: 'none',
           }}
         />
-
-        {/* Day 0 dot (left, static, small) */}
         <div
           style={{
-            position: 'absolute',
-            left: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            background: '#999999',
-            border: '2px solid #FFFFFF',
-            pointerEvents: 'none',
+            position: 'absolute', right: 0, top: '50%', transform: 'translate(50%, -50%)',
+            width: 8, height: 8, borderRadius: '50%', background: '#FFB3D1', pointerEvents: 'none',
           }}
         />
-
-        {/* Today — draggable handle */}
         <div
           style={{
-            position: 'absolute',
-            left: `${todayPct}%`,
-            top: '50%',
+            position: 'absolute', left: `${pct}%`, top: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 20,
-            height: 20,
-            borderRadius: '50%',
-            background: '#1A1A1A',
-            border: '3px solid #FFFFFF',
-            boxShadow: '0 0 0 2px #1A1A1A',
+            width: 16, height: 16, borderRadius: '50%', background: '#FFB3D1',
             cursor: dragging ? 'grabbing' : 'grab',
-            touchAction: 'none',     // prevent scroll hijack on mobile
-            userSelect: 'none',
-            zIndex: 2,
+            touchAction: 'none', userSelect: 'none', zIndex: 2,
             transition: dragging ? 'none' : 'left 0.3s ease',
           }}
           onPointerDown={(e) => {
@@ -122,7 +79,7 @@ function TimelineScrubber() {
           }}
           onPointerMove={(e) => {
             if (!isDragging.current) return
-            setTodayPct(pctFromClientX(e.clientX))
+            setPct(pctFromClientX(e.clientX))
           }}
           onPointerUp={(e) => {
             e.currentTarget.releasePointerCapture(e.pointerId)
@@ -134,80 +91,55 @@ function TimelineScrubber() {
             setDragging(false)
           }}
         />
-
-        {/* Forecast dot (right, static, small) */}
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            background: '#CCCCCC',
-            border: '2px solid #FFFFFF',
-            pointerEvents: 'none',
-          }}
-        />
       </div>
 
-      {/* ── Labels ── */}
+      {/* Labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-        <span style={{ fontSize: 11, color: '#999999' }}>Day 0</span>
+        <span style={{ fontSize: 9, color: '#999999', letterSpacing: '0.5px' }}>DAY 0</span>
         <span
-          onClick={() => setTodayPct(50)}
-          style={{ fontSize: 11, color: '#1A1A1A', fontWeight: 600, cursor: 'pointer', userSelect: 'none' }}
-          title="Tap to reset to today"
+          onClick={() => setPct(50)}
+          style={{ fontSize: 9, color: '#000000', fontWeight: 600, letterSpacing: '0.5px', cursor: 'pointer', userSelect: 'none' }}
         >
-          Today
+          TODAY
         </span>
-        <span style={{ fontSize: 11, color: '#999999' }}>Forecast</span>
+        <span style={{ fontSize: 9, color: '#999999', letterSpacing: '0.5px' }}>FORECAST</span>
       </div>
     </div>
   )
 }
 
-// ── Stat cards ────────────────────────────────────────────────────────────────
+// ── Stat card ─────────────────────────────────────────────────────────────────
 
 function StatCard({
-  label,
-  bigNumber,
-  caption,
-  progressBar,
+  label, bigNumber, caption, gradient, progress,
 }: {
   label: string
   bigNumber: string
-  caption: string
-  progressBar?: number
+  caption?: string
+  gradient: string
+  progress?: number
 }) {
   return (
-    <div
-      style={{
-        flex: 1,
-        background: '#F5F5F5',
-        border: '1px solid #E0E0E0',
-        borderRadius: 12,
-        padding: '14px 12px',
-      }}
-    >
-      <div style={{ fontSize: 10, color: '#999999', fontWeight: 600, letterSpacing: '0.6px', marginBottom: 6 }}>
+    <div style={{ flex: 1, background: gradient, borderRadius: 20, padding: 14 }}>
+      <div style={{ fontSize: 9, color: '#666666', fontWeight: 600, letterSpacing: '0.5px', marginBottom: 6 }}>
         {label}
       </div>
-      <div style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.1 }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: '#000000', lineHeight: 1.1 }}>
         {bigNumber}
       </div>
-      <div style={{ fontSize: 11, color: '#666666', marginTop: 4, lineHeight: 1.3 }}>
-        {caption}
-      </div>
-      {progressBar !== undefined && (
-        <div style={{ marginTop: 10, height: 3, background: '#E0E0E0', borderRadius: 2 }}>
+      {caption && (
+        <div style={{ fontSize: 12, color: '#666666', marginTop: 5, lineHeight: 1.3 }}>
+          {caption}
+        </div>
+      )}
+      {progress !== undefined && (
+        <div style={{ marginTop: 8, height: 4, background: '#E0E0E0', borderRadius: 999 }}>
           <div
             style={{
               height: '100%',
-              width: `${Math.round(progressBar * 100)}%`,
-              background: '#404040',
-              borderRadius: 2,
+              width: `${Math.round(progress * 100)}%`,
+              background: '#FFB3D1',
+              borderRadius: 999,
             }}
           />
         </div>
@@ -220,43 +152,94 @@ function StatCard({
 
 export default function TrackingHome() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
-      {/* Top row */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <Pill>Day {trackingData.dayOfTreatment} of treatment</Pill>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
+      {/* ── TOP region ── */}
+      <div style={{ flexShrink: 0 }}>
+        <div style={{ padding: '14px 24px 0' }}>
+          <Pill>day {trackingData.dayOfTreatment} of treatment</Pill>
+        </div>
+        <div style={{ padding: '12px 24px 0' }}>
+          <h1
+            style={{
+              fontSize: 20,
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '-0.5px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            your smile in motion
+          </h1>
+        </div>
       </div>
 
-      {/* Headline */}
-      <div style={{ padding: '14px 24px 0' }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.2 }}>
-          Your smile,<br />in motion
-        </h1>
+      {/* ── CENTER region — vertically centered hero ── */}
+      <div
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {/* User photo with soft pink glow */}
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 200, height: 200, borderRadius: '50%',
+              background: 'rgba(255,179,209,0.4)', filter: 'blur(60px)', pointerEvents: 'none',
+            }}
+          />
+          <img
+            src="/user.png"
+            alt="Your smile"
+            style={{ position: 'relative', width: 240, height: 'auto', display: 'block' }}
+          />
+        </div>
+
+        <Timeline />
       </div>
 
-      {/* Hero */}
-      <div style={{ padding: '16px 24px 0' }}>
-        <HatchedPlaceholder
-          label="User face photo + AR braces overlay — current state"
-          height={252}
-        />
+      {/* ── DAY NUMBER region — its own band, centered between timeline and cards ── */}
+      <div
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#000000', letterSpacing: '-0.6px', lineHeight: 1 }}>
+            day {trackingData.dayOfTreatment}
+          </span>
+          <span style={{ fontSize: 9, fontWeight: 600, color: '#999999', letterSpacing: '0.5px' }}>
+            TODAY
+          </span>
+        </div>
       </div>
 
-      {/* Draggable timeline */}
-      <TimelineScrubber />
-
-      {/* Stat cards */}
-      <div style={{ display: 'flex', gap: 12, padding: '20px 24px 0' }}>
-        <StatCard
-          label="THIS WEEK"
-          bigNumber={trackingData.weeklyMovement}
-          caption={trackingData.weeklyToothLabel}
-        />
-        <StatCard
-          label="AI FORECAST"
-          bigNumber={trackingData.forecastRange}
-          caption="Until completion"
-          progressBar={trackingData.forecastProgress}
-        />
+      {/* ── BOTTOM region — cards ── */}
+      <div style={{ flexShrink: 0, paddingBottom: 16 }}>
+        {/* Stat cards */}
+        <div style={{ display: 'flex', gap: 10, padding: '0 24px' }}>
+          <StatCard
+            label="THIS WEEK"
+            bigNumber={trackingData.weeklyMovement}
+            caption="lower right canine moved"
+            gradient="linear-gradient(135deg, #FFD9E5 0%, #EFE0FF 100%)"
+          />
+          <StatCard
+            label="AI FORECAST"
+            bigNumber="7–9 month"
+            gradient="linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)"
+            progress={0.65}
+          />
+        </div>
       </div>
     </div>
   )

@@ -3,16 +3,15 @@
 // draftsCount controlled at app level; empty state when 0.
 
 import { useState, useEffect, useRef } from 'react'
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
 import { drafts, type Draft } from '@/lib/mockData'
 
 // ── Action definitions ────────────────────────────────────────────────────────
 
 const ACTIONS = [
-  { label: 'Save to device gallery', primary: true,  toast: 'saved to device gallery' },
-  { label: 'Share',                  primary: false, toast: 'share sheet would open here' },
-  { label: 'Add to timeline',        primary: false, toast: 'added to your timeline' },
-  { label: 'Delete',                 primary: false, toast: 'capture deleted', danger: true },
+  { label: 'save to device gallery', primary: true,  toast: 'saved to device gallery' },
+  { label: 'share',                  primary: false, toast: 'share sheet would open here' },
+  { label: 'add to timeline',        primary: false, toast: 'added to your timeline' },
+  { label: 'delete',                 primary: false, toast: 'capture deleted', danger: true },
 ] as const
 
 // ── Play indicator — circular badge with a white triangle (video items) ───────
@@ -63,13 +62,14 @@ function DraftDetail({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
 
       {/* Toast — slides in at top of content area */}
       {toast && (
         <div
+          className="soft-in"
           style={{
-            background: '#1A1A1A',
+            background: '#000000',
             color: '#FFFFFF',
             padding: '11px 24px',
             fontSize: 13,
@@ -108,12 +108,12 @@ function DraftDetail({
           }}
           aria-label="Back"
         >
-          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+          <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
-        <h2 style={{ fontSize: 17, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-          Review capture
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#000000', margin: 0 }}>
+          review capture
         </h2>
       </div>
 
@@ -124,7 +124,7 @@ function DraftDetail({
             position:     'relative',
             width:        '100%',
             aspectRatio:  '1 / 1',
-            borderRadius: 12,
+            borderRadius: 20,
             overflow:     'hidden',
             background:   '#F5F5F5',
           }}
@@ -159,7 +159,7 @@ function DraftDetail({
           textAlign: 'center',
         }}
       >
-        Captures stay in Drafts until you decide. Nothing is shared automatically.
+        captures stay in drafts until you decide. nothing is shared automatically.
       </p>
 
       {/* Action buttons */}
@@ -175,12 +175,12 @@ function DraftDetail({
               style={{
                 width:        '100%',
                 height:       50,
-                background:   isPrimary ? '#1A1A1A' : '#FFFFFF',
-                color:        isPrimary ? '#FFFFFF' : isDanger ? '#B00020' : '#1A1A1A',
-                border:       isPrimary ? 'none' : '1px solid #C8C8C8',
-                borderRadius: 12,
-                fontSize:     15,
-                fontWeight:   isPrimary ? 600 : 500,
+                background:   isPrimary ? '#000000' : '#FFFFFF',
+                color:        isPrimary ? '#FFFFFF' : isDanger ? '#E53935' : '#000000',
+                border:       isPrimary ? 'none' : '0.5px solid #000000',
+                borderRadius: 14,
+                fontSize:     13,
+                fontWeight:   600,
                 cursor:       'pointer',
               }}
             >
@@ -207,9 +207,16 @@ function EmptyState() {
         gap:            14,
       }}
     >
-      <HatchedPlaceholder circle width={72} height={72} label="" />
-      <p style={{ fontSize: 15, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-        No captures yet
+      <div
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #FFD9E5 0%, #EFE0FF 50%, #E0EEEE 100%)',
+        }}
+      />
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#000000', margin: 0 }}>
+        no captures yet
       </p>
       <p
         style={{
@@ -220,7 +227,7 @@ function EmptyState() {
           margin:     0,
         }}
       >
-        Arm the camera to start capturing POV moments hands-free
+        arm the camera to start capturing POV moments hands-free
       </p>
     </div>
   )
@@ -248,7 +255,7 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
 
       {/* Header */}
       <div
@@ -268,22 +275,22 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
             background: 'none',
             border:     'none',
             cursor:     'pointer',
-            color:      '#1A1A1A',
-            fontSize:   15,
+            color:      '#000000',
+            fontSize:   13,
             padding:    0,
           }}
         >
-          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+          <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          Back
+          back
         </button>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>Drafts</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#000000' }}>drafts</h2>
         <div style={{ width: 46 }} />
       </div>
 
-      <p style={{ fontSize: 13, color: '#999999', padding: '6px 24px 0', textAlign: 'center' }}>
-        Review before saving or sharing
+      <p style={{ fontSize: 12, color: '#999999', padding: '6px 24px 0', textAlign: 'center' }}>
+        review before saving or sharing
       </p>
 
       {/* Grid or empty state */}
@@ -309,7 +316,7 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
               style={{
                 position:     'relative',
                 aspectRatio:  '1 / 1',
-                borderRadius: 12,
+                borderRadius: 20,
                 overflow:     'hidden',
                 background:   '#F5F5F5',
                 cursor:       'pointer',
@@ -338,12 +345,12 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
             background:     'none',
             border:         'none',
             fontSize:       12,
-            color:          '#AAAAAA',
+            color:          '#999999',
             cursor:         'pointer',
             textDecoration: 'underline',
           }}
         >
-          Clear all (demo)
+          clear all (demo)
         </button>
       </div>
 

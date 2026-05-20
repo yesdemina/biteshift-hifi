@@ -10,20 +10,20 @@ interface ChangePasswordScreenProps {
 
 const inputStyle: React.CSSProperties = {
   width:       '100%',
-  padding:     '12px 14px',
+  padding:     '14px',
   fontSize:    16,
-  color:       '#1A1A1A',
+  color:       '#000000',
   background:  '#FFFFFF',
-  border:      '1px solid #E0E0E0',
-  borderRadius: 8,
+  borderRadius: 12,
   outline:     'none',
   fontFamily:  'inherit',
   boxSizing:   'border-box',
+  WebkitTapHighlightColor: 'transparent',
 }
 
 const labelStyle: React.CSSProperties = {
   fontSize:     13,
-  color:        '#666666',
+  color:        '#999999',
   marginBottom: 6,
   display:      'block',
 }
@@ -48,21 +48,22 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 32, background: '#FFFFFF' }}>
 
       {/* Toast */}
       {toast && (
         <div
+          className="soft-in"
           style={{
-            background:   '#F5F5F5',
-            border:       '1px solid #E0E0E0',
-            borderRadius: 8,
+            background:   '#FFD9E5',
+            border:       'none',
+            borderRadius: 12,
             margin:       '12px 24px 0',
             padding:      '10px 16px',
             fontSize:     13,
-            color:        '#1A1A1A',
+            color:        '#000000',
             textAlign:    'center',
-            fontWeight:   500,
+            fontWeight:   600,
           }}
         >
           password updated
@@ -85,20 +86,20 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
             padding:    0,
           }}
         >
-          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+          <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          Back
+          back
         </button>
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', padding: '14px 24px 0' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', letterSpacing: '-0.4px' }}>
         change password
       </h1>
 
       {/* Subtitle */}
-      <p style={{ fontSize: 14, color: '#666666', padding: '6px 24px 0', lineHeight: 1.45, marginBottom: 0 }}>
+      <p style={{ fontSize: 13, color: '#999999', padding: '6px 24px 0', lineHeight: 1.45, marginBottom: 0 }}>
         create a new password for your account
       </p>
 
@@ -110,6 +111,7 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
           <label style={labelStyle}>new password</label>
           <input
             type="password"
+            className="field-input"
             placeholder="••••••••"
             value={newPw}
             onChange={(e) => setNewPw(e.target.value)}
@@ -123,6 +125,7 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
           <label style={labelStyle}>confirm new password</label>
           <input
             type="password"
+            className="field-input"
             placeholder="••••••••"
             value={confirmPw}
             onChange={(e) => setConfirmPw(e.target.value)}
@@ -143,19 +146,19 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
           style={{
             width:        '100%',
             padding:      '14px 0',
-            fontSize:     16,
+            fontSize:     13,
             fontWeight:   600,
             fontFamily:   'inherit',
-            background:   canSubmit ? '#1A1A1A' : '#E0E0E0',
+            background:   canSubmit ? '#000000' : '#E0E0E0',
             color:        canSubmit ? '#FFFFFF' : '#999999',
             border:       'none',
-            borderRadius: 8,
+            borderRadius: 14,
             cursor:       canSubmit ? 'pointer' : 'not-allowed',
             transition:   'background 0.15s, color 0.15s',
             marginTop:    8,
           }}
         >
-          Update password
+          update password
         </button>
 
       </div>

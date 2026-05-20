@@ -217,6 +217,7 @@ export default function Home() {
         <CameraArmed
           onDisarm={handleDisarm}
           onViewDrafts={() => setCameraSub('drafts')}
+          draftsCount={draftsCount}
         />
       )
       if (cameraSub === 'drafts')   return (

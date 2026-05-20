@@ -24,7 +24,7 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
           overflow: 'hidden',
           boxShadow: '0 0 0 1px #D0D0D0, 0 24px 64px rgba(0,0,0,0.10)',
           fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+            "'RF Dewi Extended', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
         }}
       >
         {children}

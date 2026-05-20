@@ -1,6 +1,4 @@
 // Screen 4a — Support Home
-// Headline personalised to "hi, {name}" (falls back to "hi there").
-// Subtitle "Gentle reminders, no pressure" removed per spec.
 
 import { reminderCards, supplies } from '@/lib/mockData'
 
@@ -9,70 +7,71 @@ interface SupportHomeProps {
   onProfile: () => void
 }
 
+const CARD_BGS = ['#FFD9E5', '#EFE0FF', '#E0EEEE']
+
 function ChevronRight() {
   return (
     <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
-      <path
-        d="M1.5 1.5L6.5 6.5L1.5 11.5"
-        stroke="#AAAAAA"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
+      <path d="M1.5 1.5L6.5 6.5L1.5 11.5" stroke="#999999" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
 
 export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
-  const greeting = userName.trim() ? `hi, ${userName.trim()}` : 'hi there'
+  const trimmed = userName.trim()
+  const greeting = trimmed ? `hi, ${trimmed}` : 'hi there'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
-      {/* Personalised headline + profile icon */}
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
+      {/* Headline + avatar */}
       <div
         style={{
-          display:        'flex',
-          alignItems:     'center',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          padding:        '16px 24px 0',
+          padding: '14px 24px 0',
         }}
       >
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', letterSpacing: '-0.5px', margin: 0 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', letterSpacing: '-0.4px', margin: 0 }}>
           {greeting}
         </h1>
         <button
           onClick={onProfile}
           aria-label="Profile"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: '#FFD9E5',
+            border: 'none',
+            cursor: 'pointer',
+            overflow: 'hidden',
+            flexShrink: 0,
+            padding: 0,
+          }}
         >
-          {/* Person silhouette — matches tab bar line weight */}
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="8" r="4" stroke="#1A1A1A" strokeWidth="1.6" />
-            <path
-              d="M4 20c0-4 3.582-7 8-7s8 3 8 7"
-              stroke="#1A1A1A"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          </svg>
+          <img
+            src="/user.png"
+            alt="Profile"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: '50% 25%',
+              display: 'block',
+            }}
+          />
         </button>
       </div>
 
       {/* Reminder cards */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-          padding: '18px 24px 0',
-        }}
-      >
-        {reminderCards.map((card) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '16px 24px 0' }}>
+        {reminderCards.map((card, i) => (
           <div
             key={card.id}
             style={{
-              background: '#F5F5F5',
-              border: '1px solid #E0E0E0',
-              borderRadius: 12,
+              background: CARD_BGS[i % CARD_BGS.length],
+              borderRadius: 20,
               padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
@@ -80,50 +79,43 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
               gap: 12,
             }}
           >
-            <p style={{ fontSize: 13, color: '#444444', lineHeight: 1.45, flex: 1 }}>
+            <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.45, flex: 1 }}>
               {card.text}
             </p>
             <button
               style={{
-                background: 'none',
-                border: '1px solid #C8C8C8',
-                borderRadius: 20,
-                padding: '5px 12px',
+                background: '#000000',
+                border: 'none',
+                borderRadius: 999,
+                padding: '7px 14px',
                 fontSize: 12,
-                color: '#1A1A1A',
-                fontWeight: 500,
+                color: '#FFFFFF',
+                fontWeight: 600,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
               }}
             >
-              {card.action}
+              {card.action.toLowerCase()}
             </button>
           </div>
         ))}
       </div>
 
       {/* Supplies section */}
-      <div style={{ padding: '24px 24px 0' }}>
+      <div style={{ padding: '20px 24px 0' }}>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 9,
             color: '#999999',
-            fontWeight: 700,
-            letterSpacing: '0.7px',
-            marginBottom: 10,
+            fontWeight: 600,
+            letterSpacing: '0.5px',
+            marginBottom: 6,
           }}
         >
           SUPPLIES
         </div>
-        <div
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid #E0E0E0',
-            borderRadius: 12,
-            overflow: 'hidden',
-          }}
-        >
+        <div>
           {supplies.map((item, i) => (
             <button
               key={item.id}
@@ -132,15 +124,15 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '15px 16px',
+                padding: '13px 4px',
                 background: 'none',
                 border: 'none',
-                borderTop: i === 0 ? 'none' : '1px solid #E0E0E0',
+                borderBottom: i === supplies.length - 1 ? 'none' : '0.5px solid rgba(0,0,0,0.06)',
                 cursor: 'pointer',
                 textAlign: 'left',
               }}
             >
-              <span style={{ fontSize: 15, color: '#1A1A1A' }}>{item.label}</span>
+              <span style={{ fontSize: 13, color: '#000000' }}>{item.label.toLowerCase()}</span>
               <ChevronRight />
             </button>
           ))}

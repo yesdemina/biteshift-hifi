@@ -13,40 +13,28 @@ interface ScanHistoryProps {
 
 function StatusDot({ type }: { type: DotType }) {
   const base: React.CSSProperties = {
-    width:     12,
-    height:    12,
+    width: 12,
+    height: 12,
     borderRadius: '50%',
     flexShrink: 0,
+    boxSizing: 'border-box',
   }
 
   if (type === 'filled') {
-    return <div style={{ ...base, background: '#404040' }} />
+    // good
+    return <div style={{ ...base, background: '#C8E0E0', border: '0.5px solid #5FA4A4' }} />
   }
-  if (type === 'outline') {
-    return <div style={{ ...base, border: '1.5px solid #404040', boxSizing: 'border-box' }} />
+  if (type === 'half') {
+    // ok
+    return <div style={{ ...base, background: '#FFB3D1' }} />
   }
-  // half — left side filled, right side white, full border
-  return (
-    <div
-      style={{
-        ...base,
-        background: 'linear-gradient(to right, #404040 50%, #FFFFFF 50%)',
-        border:     '1.5px solid #404040',
-        boxSizing:  'border-box',
-      }}
-    />
-  )
+  // outline — needs attention
+  return <div style={{ ...base, border: '0.5px solid #E0E0E0' }} />
 }
 
 // ── History row ───────────────────────────────────────────────────────────────
 
-function HistoryRow({
-  entry,
-  onSelect,
-}: {
-  entry:    ScanHistoryEntry
-  onSelect: () => void
-}) {
+function HistoryRow({ entry, onSelect }: { entry: ScanHistoryEntry; onSelect: () => void }) {
   return (
     <div
       role="button"
@@ -54,28 +42,23 @@ function HistoryRow({
       onClick={onSelect}
       onKeyDown={(e) => e.key === 'Enter' && onSelect()}
       style={{
-        display:      'flex',
-        alignItems:   'center',
-        background:   '#FFFFFF',
-        border:       '1px solid #E0E0E0',
-        borderRadius: 12,
-        padding:      '12px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        background: '#FFFFFF',
+        border: '0.5px solid rgba(0,0,0,0.06)',
+        borderRadius: 16,
+        padding: '12px 14px',
         marginBottom: 8,
-        cursor:       'pointer',
-        gap:          12,
+        cursor: 'pointer',
+        gap: 12,
       }}
     >
-      {/* Left — date */}
-      <div style={{ minWidth: 84, flexShrink: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{entry.date}</div>
+      <div style={{ minWidth: 80, flexShrink: 0 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#000000' }}>{entry.date}</div>
       </div>
-
-      {/* Center — inline stats */}
-      <div style={{ flex: 1, fontSize: 12, color: '#666666', lineHeight: 1.35 }}>
+      <div style={{ flex: 1, fontSize: 11, color: '#999999', lineHeight: 1.35 }}>
         {entry.stats}
       </div>
-
-      {/* Right — status dot */}
       <StatusDot type={entry.dotType} />
     </div>
   )
@@ -85,50 +68,48 @@ function HistoryRow({
 
 export default function ScanHistory({ onBack, onSelectScan }: ScanHistoryProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
-
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
       {/* Top row — back arrow */}
       <div style={{ padding: '16px 24px 0' }}>
         <button
           onClick={onBack}
           style={{
-            display:    'flex',
+            display: 'flex',
             alignItems: 'center',
-            gap:        6,
+            gap: 6,
             background: 'none',
-            border:     'none',
-            cursor:     'pointer',
-            color:      '#1A1A1A',
-            fontSize:   15,
-            padding:    0,
+            border: 'none',
+            cursor: 'pointer',
+            color: '#000000',
+            fontSize: 13,
+            padding: 0,
           }}
         >
-          <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+          <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+            <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          Back
+          back
         </button>
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', padding: '14px 24px 0' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', letterSpacing: '-0.4px' }}>
         scan history
       </h1>
 
       {/* Summary card */}
-      <div style={{ padding: '4px 24px 0' }}>
+      <div style={{ padding: '8px 24px 0' }}>
         <div
           style={{
-            background:   '#F5F5F5',
-            border:       '1px solid #E0E0E0',
-            borderRadius: 12,
-            padding:      '14px 16px',
+            background: 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)',
+            borderRadius: 20,
+            padding: '14px 16px',
           }}
         >
-          <div style={{ fontSize: 12, color: '#999999', marginBottom: 6 }}>
+          <div style={{ fontSize: 11, color: '#666666', marginBottom: 5 }}>
             12 scans · last 3 months
           </div>
-          <div style={{ fontSize: 18, fontWeight: 500, color: '#1A1A1A' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#000000' }}>
             hygiene is improving
           </div>
         </div>
@@ -137,14 +118,9 @@ export default function ScanHistory({ onBack, onSelectScan }: ScanHistoryProps) 
       {/* History list */}
       <div style={{ padding: '16px 24px 0' }}>
         {scanHistory.map((entry) => (
-          <HistoryRow
-            key={entry.id}
-            entry={entry}
-            onSelect={() => onSelectScan(entry)}
-          />
+          <HistoryRow key={entry.id} entry={entry} onSelect={() => onSelectScan(entry)} />
         ))}
       </div>
-
     </div>
   )
 }

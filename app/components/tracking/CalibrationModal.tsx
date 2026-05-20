@@ -2,8 +2,6 @@
 // Bottom-sheet modal that slides up over 1a. Uses position:absolute (NOT
 // position:fixed) so it stays contained inside the PhoneFrame.
 
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
-
 interface CalibrationModalProps {
   onLater: () => void
   onScan: () => void
@@ -16,7 +14,7 @@ export default function CalibrationModal({ onLater, onScan }: CalibrationModalPr
       style={{
         position: 'absolute',
         inset: 0,
-        background: 'rgba(0, 0, 0, 0.45)',
+        background: 'rgba(0, 0, 0, 0.5)',
         zIndex: 50,
         display: 'flex',
         flexDirection: 'column',
@@ -36,7 +34,7 @@ export default function CalibrationModal({ onLater, onScan }: CalibrationModalPr
           position: 'relative',
           background: '#FFFFFF',
           borderRadius: '24px 24px 0 0',
-          padding: '32px 28px 48px',
+          padding: '32px 24px 40px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -54,40 +52,42 @@ export default function CalibrationModal({ onLater, onScan }: CalibrationModalPr
           }}
         />
 
-        {/* Face-scan icon placeholder (small circle) */}
-        <HatchedPlaceholder
-          label="Face scan icon"
-          circle
-          width={72}
-          height={72}
-          style={{ marginBottom: 20 }}
+        {/* Iridescent circle icon */}
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',
+            marginBottom: 20,
+          }}
         />
 
         {/* Headline */}
         <h2
           style={{
-            fontSize: 22,
+            fontSize: 18,
             fontWeight: 700,
-            color: '#1A1A1A',
+            color: '#000000',
             textAlign: 'center',
-            marginBottom: 10,
+            marginBottom: 8,
           }}
         >
-          Time to recalibrate
+          time to recalibrate
         </h2>
 
         {/* Body */}
         <p
           style={{
-            fontSize: 14,
-            color: '#666666',
+            fontSize: 13,
+            color: '#999999',
             textAlign: 'center',
             lineHeight: 1.5,
-            marginBottom: 28,
+            marginBottom: 24,
             maxWidth: 280,
           }}
         >
-          Your teeth have moved noticeably. Let&apos;s scan your face to update
+          your teeth have moved noticeably. let&apos;s scan your face to update
           the picture.
         </p>
 
@@ -96,18 +96,18 @@ export default function CalibrationModal({ onLater, onScan }: CalibrationModalPr
           onClick={onScan}
           style={{
             width: '100%',
-            height: 52,
-            background: '#1A1A1A',
-            color: '#FFFFFF',
+            height: 48,
+            background: '#FFB3D1',
+            color: '#000000',
             border: 'none',
-            borderRadius: 12,
-            fontSize: 16,
+            borderRadius: 14,
+            fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
             marginBottom: 14,
           }}
         >
-          Scan my face
+          scan my face
         </button>
 
         {/* Secondary / dismiss */}
@@ -116,13 +116,12 @@ export default function CalibrationModal({ onLater, onScan }: CalibrationModalPr
           style={{
             background: 'none',
             border: 'none',
-            fontSize: 14,
+            fontSize: 13,
             color: '#999999',
             cursor: 'pointer',
-            textDecoration: 'underline',
           }}
         >
-          Later
+          later
         </button>
       </div>
     </div>

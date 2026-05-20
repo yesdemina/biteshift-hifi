@@ -1,7 +1,6 @@
 // Screen 2d — Tooth Detail
-// "Got it" returns to Scan Result (2c).
+// "got it" returns to Scan Result (2c).
 
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
 import { toothData } from '@/lib/mockData'
 
 interface ToothDetailProps {
@@ -19,65 +18,53 @@ function BackButton({ onBack }: { onBack: () => void }) {
         background: 'none',
         border: 'none',
         cursor: 'pointer',
-        color: '#1A1A1A',
-        fontSize: 15,
+        color: '#000000',
+        fontSize: 13,
         padding: 0,
       }}
     >
-      <svg width="9" height="15" viewBox="0 0 9 15" fill="none">
-        <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#1A1A1A" strokeWidth="1.7" strokeLinecap="round" />
+      <svg width="8" height="14" viewBox="0 0 9 15" fill="none">
+        <path d="M7.5 1.5L2 7.5L7.5 13.5" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
-      Back
+      back
     </button>
   )
 }
 
-function InfoCard({
-  tag,
-  text,
-}: {
-  tag: string
-  text: string
-}) {
+const CARD_BGS = ['#FFD9E5', '#EFE0FF', '#E0EEEE']
+
+function InfoCard({ tag, text, bg }: { tag: string; text: string; bg: string }) {
   return (
-    <div
-      style={{
-        background: '#F5F5F5',
-        border: '1px solid #E0E0E0',
-        borderRadius: 12,
-        padding: '14px 16px',
-      }}
-    >
+    <div style={{ background: bg, borderRadius: 20, padding: '16px 18px' }}>
       <span
         style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: '#999999',
-          letterSpacing: '0.6px',
+          fontSize: 9,
+          fontWeight: 600,
+          color: '#666666',
+          letterSpacing: '0.5px',
           marginRight: 8,
         }}
       >
         {tag}
       </span>
-      <span style={{ fontSize: 14, color: '#1A1A1A', lineHeight: 1.4 }}>{text}</span>
+      <span style={{ fontSize: 13, color: '#000000', lineHeight: 1.4 }}>{text}</span>
     </div>
   )
 }
 
 export default function ToothDetail({ onBack }: ToothDetailProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
       {/* Top row */}
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
           padding: '16px 24px 0',
         }}
       >
         <BackButton onBack={onBack} />
-        {/* Centred pill */}
         <div
           style={{
             position: 'absolute',
@@ -85,39 +72,67 @@ export default function ToothDetail({ onBack }: ToothDetailProps) {
             transform: 'translateX(-50%)',
             display: 'inline-flex',
             alignItems: 'center',
-            background: '#F5F5F5',
-            border: '1px solid #E0E0E0',
-            borderRadius: 20,
+            background: '#FFD9E5',
+            borderRadius: 999,
             padding: '5px 12px',
             fontSize: 12,
-            color: '#666666',
-            fontWeight: 500,
+            color: '#000000',
+            fontWeight: 600,
             whiteSpace: 'nowrap',
           }}
         >
-          {toothData.pill}
+          {toothData.pill.toLowerCase()}
         </div>
-        <div style={{ width: 28 }} />
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', padding: '14px 24px 0' }}>
-        {toothData.headline}
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px' }}>
+        {toothData.headline.toLowerCase()}
       </h1>
 
-      {/* Hero */}
+      {/* Hero — zoomed tooth with pink problem-area glow */}
       <div style={{ padding: '14px 24px 0' }}>
-        <HatchedPlaceholder
-          label="Zoomed tooth visualization — highlighted plaque area"
-          height={190}
-        />
+        <div
+          style={{
+            position: 'relative',
+            height: 190,
+            borderRadius: 20,
+            background: '#F5F5F5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              width: 120,
+              height: 120,
+              borderRadius: '50%',
+              background: '#FFB3D1',
+              opacity: 0.45,
+              filter: 'blur(28px)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'relative',
+              width: 90,
+              height: 90,
+              borderRadius: '50%',
+              border: '2px solid #FFB3D1',
+            }}
+          />
+        </div>
       </div>
 
       {/* Three info cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '16px 24px 0' }}>
-        <InfoCard tag="ISSUE" text={toothData.issue} />
-        <InfoCard tag="WHY"   text={toothData.why} />
-        <InfoCard tag="FIX"   text={toothData.fix} />
+        <InfoCard tag="ISSUE" text={toothData.issue} bg={CARD_BGS[0]} />
+        <InfoCard tag="WHY"   text={toothData.why}   bg={CARD_BGS[1]} />
+        <InfoCard tag="FIX"   text={toothData.fix}   bg={CARD_BGS[2]} />
       </div>
 
       {/* Got it */}
@@ -126,17 +141,17 @@ export default function ToothDetail({ onBack }: ToothDetailProps) {
           onClick={onBack}
           style={{
             width: '100%',
-            height: 52,
-            background: '#1A1A1A',
+            padding: '14px 0',
+            background: '#000000',
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: 12,
-            fontSize: 16,
+            borderRadius: 14,
+            fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
           }}
         >
-          Got it
+          got it
         </button>
       </div>
     </div>
