@@ -62,11 +62,17 @@ export const scanHistory: ScanHistoryEntry[] = [
 export interface Draft {
   id: number
   label: string
+  src: string
+  type: 'photo' | 'video'
 }
-export const drafts: Draft[] = Array.from({ length: 6 }, (_, i) => ({
-  id: i,
-  label: 'POV moment',
-}))
+export const drafts: Draft[] = [
+  { id: 0, label: 'POV moment', src: '/draft-01.jpg', type: 'photo' },
+  { id: 1, label: 'POV moment', src: '/draft-02.jpg', type: 'video' },
+  { id: 2, label: 'POV moment', src: '/draft-03.jpg', type: 'photo' },
+  { id: 3, label: 'POV moment', src: '/draft-04.jpg', type: 'video' },
+  { id: 4, label: 'POV moment', src: '/draft-05.jpg', type: 'photo' },
+  { id: 5, label: 'POV moment', src: '/draft-06.jpg', type: 'video' },
+]
 
 // Tab 4 — Support
 export interface ReminderCard {

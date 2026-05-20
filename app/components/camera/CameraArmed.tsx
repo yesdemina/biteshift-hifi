@@ -2,8 +2,6 @@
 // Toggle card is clickable → disarms (same as "Disarm now" button).
 // "Disarm now" button also disarms.  "View Drafts" → 3c.
 
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
-
 interface CameraArmedProps {
   onDisarm: () => void
   onViewDrafts: () => void
@@ -75,9 +73,53 @@ export default function CameraArmed({ onDisarm, onViewDrafts }: CameraArmedProps
         Camera armed
       </h1>
 
-      {/* Hero */}
+      {/* Hero — live POV with mouth vignette */}
       <div style={{ padding: '14px 24px 0' }}>
-        <HatchedPlaceholder label="POV viewfinder — live" height={185} />
+        <div
+          style={{
+            position:     'relative',
+            width:        '100%',
+            aspectRatio:  '1 / 1',
+            borderRadius: 12,
+            overflow:     'hidden',
+          }}
+        >
+          <img
+            src="/camera-pov.jpg"
+            alt="Live POV preview"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {/* Mouth vignette — transparent center fading to dark edges */}
+          <div
+            style={{
+              position:      'absolute',
+              inset:         0,
+              background:
+                'radial-gradient(ellipse 70% 80% at center, transparent 50%, rgba(0,0,0,0.75) 85%, rgba(0,0,0,0.95) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+          {/* Recording indicator — above the vignette */}
+          <div
+            style={{
+              position:   'absolute',
+              top:        12,
+              right:      12,
+              display:    'flex',
+              alignItems: 'center',
+              gap:        5,
+            }}
+          >
+            <span style={{ fontSize: 11, color: '#FFFFFF', letterSpacing: '0.5px' }}>REC</span>
+            <span
+              className="rec-dot"
+              style={{ width: 10, height: 10, borderRadius: '50%', background: '#E53935', display: 'block' }}
+            />
+          </div>
+        </div>
+        <p style={{ fontSize: 12, color: '#999999', marginTop: 8 }}>
+          what your camera sees right now
+        </p>
       </div>
 
       {/* ── Status card — entire card clickable to disarm ── */}

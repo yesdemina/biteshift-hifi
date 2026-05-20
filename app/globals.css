@@ -74,3 +74,21 @@ body {
 .draft-item:nth-child(4) { animation-delay: 240ms; }
 .draft-item:nth-child(5) { animation-delay: 320ms; }
 .draft-item:nth-child(6) { animation-delay: 400ms; }
+
+/* Camera Armed: pulsing REC recording indicator */
+@keyframes camPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.rec-dot {
+  animation: camPulse 1s ease-in-out infinite;
+}
+
+/* Camera Disarmed: gentle sleep-state pulse */
+@keyframes sleepPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+.sleep-dot {
+  animation: sleepPulse 2s ease-in-out infinite;
+}

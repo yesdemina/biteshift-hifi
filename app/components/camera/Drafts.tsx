@@ -4,45 +4,47 @@
 
 import { useState, useEffect, useRef } from 'react'
 import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
-import { drafts } from '@/lib/mockData'
+import { drafts, type Draft } from '@/lib/mockData'
 
 // ── Action definitions ────────────────────────────────────────────────────────
 
 const ACTIONS = [
-  {
-    label:   'Save to device gallery',
-    subtext: "Adds photo/video to your phone's camera roll",
-    primary: true,
-    toast:   'saved to device gallery',
-  },
-  {
-    label:   'Share',
-    subtext: 'Opens system share sheet',
-    primary: false,
-    toast:   'share sheet would open here',
-  },
-  {
-    label:   'Add to timeline',
-    subtext: 'Adds as a milestone in Tracking',
-    primary: false,
-    toast:   'added to your timeline',
-  },
-  {
-    label:   'Delete',
-    subtext: 'Removes capture permanently',
-    primary: false,
-    toast:   'capture deleted',
-    danger:  true,
-  },
+  { label: 'Save to device gallery', primary: true,  toast: 'saved to device gallery' },
+  { label: 'Share',                  primary: false, toast: 'share sheet would open here' },
+  { label: 'Add to timeline',        primary: false, toast: 'added to your timeline' },
+  { label: 'Delete',                 primary: false, toast: 'capture deleted', danger: true },
 ] as const
+
+// ── Play indicator — circular badge with a white triangle (video items) ───────
+
+function PlayIndicator({ size }: { size: number }) {
+  const tri = Math.round(size * 0.42)
+  return (
+    <div
+      style={{
+        width:          size,
+        height:         size,
+        borderRadius:   '50%',
+        background:     'rgba(0, 0, 0, 0.6)',
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg width={tri} height={tri} viewBox="0 0 10 10" style={{ marginLeft: tri * 0.12 }}>
+        <path d="M2 1.3L8.5 5L2 8.7Z" fill="#FFFFFF" />
+      </svg>
+    </div>
+  )
+}
 
 // ── Draft Detail (Screen 3c-detail) ──────────────────────────────────────────
 
 function DraftDetail({
-  draftIndex,
+  draft,
   onBack,
 }: {
-  draftIndex: number
+  draft: Draft
   onBack: () => void
 }) {
   const [toast, setToast] = useState<string | null>(null)
@@ -115,9 +117,36 @@ function DraftDetail({
         </h2>
       </div>
 
-      {/* Hero */}
+      {/* Hero — actual tapped image */}
       <div style={{ padding: '16px 24px 0' }}>
-        <HatchedPlaceholder label="POV moment preview" height={210} />
+        <div
+          style={{
+            position:     'relative',
+            width:        '100%',
+            aspectRatio:  '1 / 1',
+            borderRadius: 12,
+            overflow:     'hidden',
+            background:   '#F5F5F5',
+          }}
+        >
+          <img
+            src={draft.src}
+            alt="POV moment preview"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {draft.type === 'video' && (
+            <div
+              style={{
+                position:  'absolute',
+                top:       '50%',
+                left:      '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <PlayIndicator size={48} />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Caption */}
@@ -140,27 +169,23 @@ function DraftDetail({
           const isDanger  = 'danger' in action && action.danger
 
           return (
-            <div key={action.label}>
-              <button
-                onClick={() => handleAction(action.toast)}
-                style={{
-                  width:        '100%',
-                  height:       50,
-                  background:   isPrimary ? '#1A1A1A' : '#FFFFFF',
-                  color:        isPrimary ? '#FFFFFF' : isDanger ? '#B00020' : '#1A1A1A',
-                  border:       isPrimary ? 'none' : '1px solid #C8C8C8',
-                  borderRadius: 12,
-                  fontSize:     15,
-                  fontWeight:   isPrimary ? 600 : 500,
-                  cursor:       'pointer',
-                }}
-              >
-                {action.label}
-              </button>
-              <p style={{ fontSize: 11, color: '#AAAAAA', marginTop: 4, paddingLeft: 2 }}>
-                {action.subtext}
-              </p>
-            </div>
+            <button
+              key={action.label}
+              onClick={() => handleAction(action.toast)}
+              style={{
+                width:        '100%',
+                height:       50,
+                background:   isPrimary ? '#1A1A1A' : '#FFFFFF',
+                color:        isPrimary ? '#FFFFFF' : isDanger ? '#B00020' : '#1A1A1A',
+                border:       isPrimary ? 'none' : '1px solid #C8C8C8',
+                borderRadius: 12,
+                fontSize:     15,
+                fontWeight:   isPrimary ? 600 : 500,
+                cursor:       'pointer',
+              }}
+            >
+              {action.label}
+            </button>
           )
         })}
       </div>
@@ -216,7 +241,7 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
   if (selectedDraft !== null) {
     return (
       <DraftDetail
-        draftIndex={selectedDraft}
+        draft={drafts[selectedDraft]}
         onBack={() => setSelectedDraft(null)}
       />
     )
@@ -281,13 +306,25 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && setSelectedDraft(draft.id)}
-              style={{ cursor: 'pointer' }}
+              style={{
+                position:     'relative',
+                aspectRatio:  '1 / 1',
+                borderRadius: 12,
+                overflow:     'hidden',
+                background:   '#F5F5F5',
+                cursor:       'pointer',
+              }}
             >
-              <HatchedPlaceholder
-                label={draft.label}
-                height={148}
-                style={{ borderRadius: 10 }}
+              <img
+                src={draft.src}
+                alt={draft.label}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
+              {draft.type === 'video' && (
+                <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                  <PlayIndicator size={24} />
+                </div>
+              )}
             </div>
           ))}
         </div>

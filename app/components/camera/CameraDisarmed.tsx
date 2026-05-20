@@ -1,8 +1,6 @@
 // Screen 3a — Camera Disarmed (default state)
 // Tapping the toggle card OR any duration chip arms the camera → 3b.
 
-import HatchedPlaceholder from '@/app/components/shared/HatchedPlaceholder'
-
 interface CameraDisarmedProps {
   onArm: (duration: string) => void
 }
@@ -53,12 +51,37 @@ export default function CameraDisarmed({ onArm }: CameraDisarmedProps) {
         Hands-free camera
       </h1>
 
-      {/* Hero — POV viewfinder */}
+      {/* Hero — sleeping camera visual */}
       <div style={{ padding: '14px 24px 0' }}>
-        <HatchedPlaceholder
-          label="POV viewfinder — camera looks outward from your mouth (not selfie)"
-          height={210}
-        />
+        <div
+          style={{
+            width:          '100%',
+            aspectRatio:    '1 / 1',
+            background:     '#1A1A1A',
+            borderRadius:   12,
+            overflow:       'hidden',
+            display:        'flex',
+            flexDirection:  'column',
+            alignItems:     'center',
+            justifyContent: 'center',
+            gap:            12,
+          }}
+        >
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="11" y="5" width="10" height="5" rx="1.5" stroke="#666666" strokeWidth="1.6" />
+            <rect x="3" y="9" width="26" height="19" rx="3" stroke="#666666" strokeWidth="1.6" />
+            <circle cx="16" cy="18.5" r="6" stroke="#666666" strokeWidth="1.6" />
+          </svg>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <span
+              className="sleep-dot"
+              style={{ width: 6, height: 6, borderRadius: '50%', background: '#999999', display: 'block' }}
+            />
+            <span style={{ fontSize: 13, color: '#999999', fontWeight: 300 }}>
+              your bracket camera is asleep
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* ── Status card — entire card is clickable to arm ── */}
