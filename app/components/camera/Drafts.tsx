@@ -276,6 +276,7 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
           {drafts.map((draft) => (
             <div
               key={draft.id}
+              className="draft-item"
               onClick={() => setSelectedDraft(draft.id)}
               role="button"
               tabIndex={0}

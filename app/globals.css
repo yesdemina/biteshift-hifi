@@ -26,3 +26,51 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Splash slogan: misaligned letters settle into alignment */
+@keyframes settle {
+  0% {
+    transform: translateY(var(--start-y)) rotate(var(--start-rot));
+    opacity: 0;
+  }
+  30% {
+    transform: translateY(var(--start-y)) rotate(var(--start-rot));
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
+}
+
+.settle-letter {
+  display: inline-block;
+  animation: settle 1.8s ease-out forwards;
+}
+
+/* Drafts grid: staggered fade-in + slide-up cascade */
+@keyframes draftAppear {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.draft-item {
+  animation: draftAppear 400ms ease-out forwards;
+  opacity: 0;
+}
+.draft-item:nth-child(1) { animation-delay: 0ms; }
+.draft-item:nth-child(2) { animation-delay: 80ms; }
+.draft-item:nth-child(3) { animation-delay: 160ms; }
+.draft-item:nth-child(4) { animation-delay: 240ms; }
+.draft-item:nth-child(5) { animation-delay: 320ms; }
+.draft-item:nth-child(6) { animation-delay: 400ms; }
