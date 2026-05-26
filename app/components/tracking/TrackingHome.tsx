@@ -1,8 +1,8 @@
 'use client'
-// Screen 1a — Tracking Home v4
-// Stable layout: every slot has a fixed height so nothing shifts between
-// timeline positions. 5 control points (day0/past/today/future/forecast),
-// 20 past + 10 future milestones, with nearest-milestone lookup on debounce.
+// Screen 1a — Tracking Home
+// Symmetric interactive timeline (Day 0 → Day 142 → Day 283) with discrete
+// snap points at the endpoints + Today; Past and Future are continuous
+// scrubbable ranges with 10 milestones each.
 
 import { useState, useRef, useEffect } from 'react'
 
@@ -18,55 +18,45 @@ interface Milestone {
 // ── Milestone data ────────────────────────────────────────────────────────────
 
 const pastMilestones: Milestone[] = [
-  { day: 1,   text: 'brackets bonded · first day of treatment' },
-  { day: 7,   text: 'initial soreness easing · adjusting phase' },
-  { day: 14,  text: 'first arch wire engaged · gentle pressure begins' },
-  { day: 21,  text: 'upper incisors started rotating' },
-  { day: 30,  text: 'bracket pressure activated · 0.2 mm shift logged' },
-  { day: 38,  text: 'lower midline correction underway' },
-  { day: 45,  text: 'lower incisors aligning · midline correction in progress' },
-  { day: 55,  text: 'first elastic engagement · bite refinement starts' },
-  { day: 60,  text: 'upper bite gap reducing' },
-  { day: 70,  text: 'canine pressure phase begins' },
+  { day: 1,   text: 'brackets bonded' },
+  { day: 15,  text: 'first wire engaged' },
+  { day: 30,  text: 'initial 0.2 mm shift' },
+  { day: 45,  text: 'lower incisors aligning' },
+  { day: 60,  text: 'upper gap reducing' },
   { day: 75,  text: 'canine rotation began' },
-  { day: 85,  text: 'rotation past halfway · upper right canine' },
-  { day: 90,  text: 'arch shape rounding out' },
-  { day: 100, text: 'spacing closed · lower arch' },
-  { day: 108, text: 'overbite reduced · 1.2 mm vertical correction' },
-  { day: 115, text: 'molar tipping correction underway' },
-  { day: 120, text: 'upper canine rotation complete' },
-  { day: 128, text: 'lower premolar alignment finished' },
-  { day: 135, text: 'refined wire engaged · finishing phase nearing' },
-  { day: 141, text: 'yesterday · 0.1 mm overnight shift' },
+  { day: 90,  text: 'arch shape rounding' },
+  { day: 105, text: 'spacing closed below' },
+  { day: 120, text: 'upper canine rotated' },
+  { day: 135, text: 'finishing wire engaged' },
 ]
 
 const futureMilestones: Milestone[] = [
-  { day: 150, text: 'next week · upper bite refinement' },
-  { day: 165, text: 'month 6 milestone approaching' },
-  { day: 180, text: 'alignment milestone · 70% complete' },
-  { day: 195, text: 'wire size step-down · finishing phase' },
-  { day: 210, text: 'upper arch nearly settled' },
-  { day: 225, text: 'lower arch reaching target shape' },
-  { day: 240, text: 'refinement wires engaged' },
-  { day: 255, text: 'final positioning underway' },
-  { day: 263, text: 'last detail adjustments' },
-  { day: 270, text: 'projected completion · final adjustment' },
+  { day: 148, text: 'upper bite refining' },
+  { day: 163, text: '6-month mark close' },
+  { day: 178, text: '70% alignment hit' },
+  { day: 193, text: 'finishing wire phase' },
+  { day: 208, text: 'upper arch settled' },
+  { day: 223, text: 'lower arch shaping' },
+  { day: 238, text: 'refinement wires in' },
+  { day: 253, text: 'final positioning soon' },
+  { day: 268, text: 'last detail tweaks' },
+  { day: 283, text: 'projected completion' },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function nearestCP(p: number): CP {
-  if (p < 0.005) return 'day0'
-  if (p < 0.495) return 'past'
-  if (p < 0.825) return 'today'
-  if (p < 0.995) return 'future'
+  if (p <= 0.005) return 'day0'
+  if (p <  0.655) return 'past'
+  if (p <= 0.665) return 'today'
+  if (p <  0.995) return 'future'
   return 'forecast'
 }
 
-/** Piecewise linear: 0 → 0, 0.66 → 142, 1.0 → 270 */
+/** Symmetric piecewise linear: 0 → 0, 0.66 → 142, 1.0 → 283 */
 function interpolateDay(p: number): number {
   if (p <= 0.66) return Math.round((p * 142) / 0.66)
-  return Math.round(142 + ((p - 0.66) * (270 - 142)) / (1.0 - 0.66))
+  return Math.round(142 + ((p - 0.66) * (283 - 142)) / (1.0 - 0.66))
 }
 
 function nearestMilestone(arr: Milestone[], day: number): Milestone {
@@ -75,16 +65,16 @@ function nearestMilestone(arr: Milestone[], day: number): Milestone {
   )
 }
 
+/** -2.8 mm at day 1 → 0.0 mm at day 142 */
 function pastMM(day: number): string {
-  // -2.8 mm at day 1, 0.0 mm at day 142
   const mm = Math.max(0, ((142 - day) * 2.8) / 141)
   return `-${mm.toFixed(1)} mm`
 }
 
+/** 60% at day 142 → 100% at day 283 */
 function futurePct(day: number): number {
-  // 60% at day 142, 92% at day 270
-  const pct = 60 + ((day - 142) * 32) / 128
-  return Math.max(60, Math.min(92, Math.round(pct)))
+  const pct = 60 + ((day - 142) * 40) / 141
+  return Math.max(60, Math.min(100, Math.round(pct)))
 }
 
 // ── State-derived text ────────────────────────────────────────────────────────
@@ -103,13 +93,13 @@ function pillText(cp: CP, m: Milestone | null): string {
   switch (cp) {
     case 'day0':     return 'day 0 · where it began'
     case 'today':    return 'day 142 of treatment'
-    case 'forecast': return 'forecast · 9 months ahead'
+    case 'forecast': return 'day 283 · final smile projected'
     case 'past': {
-      const day = m ? m.day : 100
+      const day = m ? m.day : 75
       return `day ${day} · ${142 - day} days ago`
     }
     case 'future': {
-      const day = m ? m.day : 200
+      const day = m ? m.day : 210
       const months = Math.max(1, Math.round((day - 142) / 30))
       return `day ${day} · ${months} months from now`
     }
@@ -122,54 +112,49 @@ function headlineText(cp: CP): string {
     case 'past':     return 'how it was'
     case 'today':    return 'your smile, mid-shift'
     case 'future':   return 'how it will be'
-    case 'forecast': return 'the projected you'
+    case 'forecast': return 'how it will be'
   }
 }
 
-interface CardData {
-  label: string
-  value: string
-  valueIsText: boolean
-  subtext?: string
-  progress?: number
-}
-
-function card1Data(cp: CP, liveDay: number): CardData {
+// Card 1 = quantitative metric (label / value / subtext)
+function card1Data(cp: CP, liveDay: number): { label: string; value: string; subtext: string } {
   switch (cp) {
-    case 'day0':     return { label: 'STARTED',  value: 'baseline',    valueIsText: true,  subtext: 'initial alignment' }
-    case 'past':     return { label: 'VS TODAY', value: pastMM(liveDay), valueIsText: false, subtext: 'total movement since this point' }
-    case 'today':    return { label: 'THIS WEEK', value: '0.4 mm',     valueIsText: false, subtext: 'lower right canine moved' }
-    case 'future':   return { label: 'PREDICTED', value: `${futurePct(liveDay)}%`, valueIsText: false, subtext: 'alignment complete' }
-    case 'forecast': return { label: 'PREDICTED', value: '92%',        valueIsText: false, subtext: 'alignment complete' }
+    case 'day0':     return { label: 'MOVEMENT',  value: '0.0 mm',                 subtext: 'treatment start' }
+    case 'past':     return { label: 'VS TODAY',  value: pastMM(liveDay),         subtext: 'total since this point' }
+    case 'today':    return { label: 'THIS WEEK', value: '0.4 mm',                subtext: 'lower right canine' }
+    case 'future':   return { label: 'PREDICTED', value: `${futurePct(liveDay)}%`, subtext: 'alignment complete' }
+    case 'forecast': return { label: 'PREDICTED', value: '100%',                  subtext: 'alignment complete' }
   }
 }
 
-function card2Data(cp: CP, m: Milestone | null): CardData {
+// Card 2 = milestone (always label "MILESTONE" + text, no subtext)
+function card2Text(cp: CP, m: Milestone | null): string {
   switch (cp) {
-    case 'day0':     return { label: 'GOAL',        value: 'final smile',   valueIsText: true,  subtext: 'your ideal target' }
-    case 'past':     return { label: 'MILESTONE',   value: m ? m.text : '', valueIsText: true }
-    case 'today':    return { label: 'AI FORECAST', value: '7-9 months',    valueIsText: false, subtext: 'until your final smile', progress: 0.60 }
-    case 'future':   return { label: 'MILESTONE',   value: m ? m.text : '', valueIsText: true }
-    case 'forecast': return { label: 'CONFIDENCE',  value: 'high',          valueIsText: true,  subtext: '± 3 weeks' }
+    case 'day0':     return 'journey begins'
+    case 'past':     return m ? m.text : ''
+    case 'today':    return 'mid-treatment check-in'
+    case 'future':   return m ? m.text : ''
+    case 'forecast': return 'final adjustments'
   }
 }
 
-const PINK_GRADIENT     = 'linear-gradient(135deg, #FFD9E5 0%, #EFE0FF 100%)'
-const LAVENDER_GRADIENT = 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)'
+// ── Gradients ─────────────────────────────────────────────────────────────────
 
-// ── Stat card ─────────────────────────────────────────────────────────────────
+const CARD1_GRADIENT = 'linear-gradient(135deg, #FFD9E5 0%, #FFB3D1 100%)'
+const CARD2_GRADIENT = 'linear-gradient(135deg, #EFE0FF 0%, #E0C8FF 100%)'
 
-function StatCard({ data, gradient }: { data: CardData; gradient: string }) {
-  const { label, value, valueIsText, subtext, progress } = data
+// ── Cards ─────────────────────────────────────────────────────────────────────
+
+function MetricCard({ label, value, subtext }: { label: string; value: string; subtext: string }) {
   return (
     <div
       className="cp-fade"
       style={{
         flex: 1,
         height: 110,
-        background: gradient,
+        background: CARD1_GRADIENT,
         borderRadius: 20,
-        padding: 14,
+        padding: 16,
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
@@ -182,58 +167,76 @@ function StatCard({ data, gradient }: { data: CardData; gradient: string }) {
           color: '#666666',
           fontWeight: 600,
           letterSpacing: '0.08em',
-          marginBottom: 6,
           flexShrink: 0,
         }}
       >
         {label}
       </div>
-
       <div
         style={{
           flex: 1,
           minHeight: 0,
-          fontSize: valueIsText ? (value.length > 14 ? 13 : 18) : 22,
-          fontWeight: valueIsText && value.length > 14 ? 500 : valueIsText ? 600 : 700,
+          display: 'flex',
+          alignItems: 'center',
+          fontSize: 22,
+          fontWeight: 700,
           color: '#000000',
-          lineHeight: valueIsText && value.length > 14 ? 1.3 : 1.15,
-          display: '-webkit-box',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical' as const,
-          overflow: 'hidden',
+          lineHeight: 1.1,
         }}
       >
         {value}
       </div>
+      <div style={{ fontSize: 11, color: '#666666', lineHeight: 1.3, flexShrink: 0 }}>
+        {subtext}
+      </div>
+    </div>
+  )
+}
 
-      {subtext && (
-        <div style={{ fontSize: 11, color: '#666666', lineHeight: 1.3, flexShrink: 0, marginTop: 4 }}>
-          {subtext}
-        </div>
-      )}
-
-      {progress !== undefined && (
-        <div
-          style={{
-            marginTop: 8,
-            height: 4,
-            background: '#FFFFFF',
-            border: '0.5px solid rgba(0,0,0,0.08)',
-            borderRadius: 999,
-            boxSizing: 'border-box',
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              width: `${Math.round(progress * 100)}%`,
-              background: 'linear-gradient(90deg, #FFB3D1 0%, #E0C8FF 100%)',
-              borderRadius: 999,
-            }}
-          />
-        </div>
-      )}
+function MilestoneCard({ text }: { text: string }) {
+  return (
+    <div
+      className="cp-fade"
+      style={{
+        flex: 1,
+        height: 110,
+        background: CARD2_GRADIENT,
+        borderRadius: 20,
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 9,
+          color: '#666666',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+          marginBottom: 8,
+          flexShrink: 0,
+        }}
+      >
+        MILESTONE
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          fontSize: 13,
+          fontWeight: 500,
+          color: '#000000',
+          lineHeight: 1.3,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: 'hidden',
+        }}
+      >
+        {text}
+      </div>
     </div>
   )
 }
@@ -246,17 +249,20 @@ export default function TrackingHome() {
   const [activeMilestone, setActiveMilestone]   = useState<Milestone | null>(null)
   const [dragging, setDragging]                 = useState(false)
 
-  const isDragging  = useRef(false)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const trackRef    = useRef<HTMLDivElement>(null)
+  const isDragging         = useRef(false)
+  const debounceRef        = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const trackRef           = useRef<HTMLDivElement>(null)
+  // Authoritative live position — the debounce reads from here so it always
+  // sees the latest value, never a closure-captured stale one.
+  const handlePositionRef  = useRef(0.66)
 
-  // Debounced state update — discrete text settles 300ms after the last move.
-  const scheduleUpdate = (p: number) => {
+  const scheduleUpdate = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      const cp = nearestCP(p)
-      setActiveCP((prev) => (cp === prev ? prev : cp))
+      const p   = handlePositionRef.current
+      const cp  = nearestCP(p)
       const day = interpolateDay(p)
+      setActiveCP((prev) => (cp === prev ? prev : cp))
       if (cp === 'past') {
         setActiveMilestone(nearestMilestone(pastMilestones, day))
       } else if (cp === 'future') {
@@ -297,10 +303,9 @@ export default function TrackingHome() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }, [])
 
-  // Live values
   const liveDay = interpolateDay(handlePosition)
   const c1      = card1Data(activeCP, liveDay)
-  const c2      = card2Data(activeCP, activeMilestone)
+  const c2Text  = card2Text(activeCP, activeMilestone)
   const pill    = pillText(activeCP, activeMilestone)
   const head    = headlineText(activeCP)
   const dayLbl  = dayCounterLabel(activeCP)
@@ -387,7 +392,7 @@ export default function TrackingHome() {
           />
         </div>
 
-        {/* Timeline slot — fixed ~48 */}
+        {/* Timeline slot */}
         <div style={{ marginTop: 8 }}>
           {/* Track — no anchor dots, just the line + handle */}
           <div
@@ -424,14 +429,15 @@ export default function TrackingHome() {
               onPointerMove={(e) => {
                 if (!isDragging.current) return
                 const p = positionFromClientX(e.clientX)
+                handlePositionRef.current = p
                 setHandlePosition(p)
-                scheduleUpdate(p)
+                scheduleUpdate()
               }}
               onPointerUp={(e) => {
                 e.currentTarget.releasePointerCapture(e.pointerId)
                 isDragging.current = false
                 setDragging(false)
-                scheduleUpdate(handlePosition)
+                scheduleUpdate()
               }}
               onPointerCancel={() => {
                 isDragging.current = false
@@ -456,6 +462,7 @@ export default function TrackingHome() {
                     isTodayLabel
                       ? () => {
                           if (debounceRef.current) clearTimeout(debounceRef.current)
+                          handlePositionRef.current = 0.66
                           setHandlePosition(0.66)
                           setActiveCP('today')
                           setActiveMilestone(null)
@@ -516,8 +523,8 @@ export default function TrackingHome() {
 
         {/* Card row — fixed 110 */}
         <div style={{ display: 'flex', gap: 12, height: 110, marginTop: 12 }}>
-          <StatCard key={`c1-${activeCP}`} data={c1} gradient={PINK_GRADIENT} />
-          <StatCard key={`c2-${activeCP}-${activeMilestone?.day ?? 'x'}`} data={c2} gradient={LAVENDER_GRADIENT} />
+          <MetricCard key={`c1-${activeCP}`} label={c1.label} value={c1.value} subtext={c1.subtext} />
+          <MilestoneCard key={`c2-${activeCP}-${activeMilestone?.day ?? 'x'}`} text={c2Text} />
         </div>
 
         {/* INSIGHT slot — fixed 88, content conditional on today */}
@@ -546,7 +553,7 @@ export default function TrackingHome() {
                 INSIGHT
               </div>
               <p style={{ fontSize: 13, fontWeight: 500, color: '#000000', lineHeight: 1.45 }}>
-                on pace with your treatment plan
+                7-9 months until your final smile · on pace
               </p>
             </div>
           )}
