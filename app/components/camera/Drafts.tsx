@@ -328,10 +328,37 @@ export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps)
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
               {draft.type === 'video' && (
-                <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                <div style={{ position: 'absolute', top: 8, left: 8 }}>
                   <PlayIndicator size={24} />
                 </div>
               )}
+              {/* Countdown pill — top-right; switches to alarm style ≤3h */}
+              {(() => {
+                const cd = draft.countdown
+                const urgent = cd.endsWith('m') || (cd.endsWith('h') && parseInt(cd, 10) <= 3)
+                return (
+                  <div
+                    className={urgent ? 'urgent-pulse' : undefined}
+                    style={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      padding: '4px 8px',
+                      borderRadius: 999,
+                      background: urgent ? '#FF4D6D' : 'rgba(0,0,0,0.6)',
+                      backdropFilter: urgent ? undefined : 'blur(4px)',
+                      WebkitBackdropFilter: urgent ? undefined : 'blur(4px)',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      letterSpacing: '0.02em',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {cd}
+                  </div>
+                )
+              })()}
             </div>
           ))}
         </div>

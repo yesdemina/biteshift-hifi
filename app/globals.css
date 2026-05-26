@@ -192,3 +192,44 @@ body {
 .scanner-pulse {
   animation: scannerPulse 2.4s ease-in-out infinite;
 }
+
+/* Hygiene Result: pulsing problem-tooth glow */
+@keyframes problemGlowPulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+.problem-glow {
+  animation: problemGlowPulse 2.4s ease-in-out infinite;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+.problem-glow:hover {
+  transform: scale(1.05);
+}
+
+/* Camera: listening-state pulsing dot */
+@keyframes listeningPulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.8); }
+}
+.listening-pulse {
+  animation: listeningPulse 2s ease-in-out infinite;
+}
+
+/* Drafts: urgent countdown (≤3h) — gentle alarm pulse */
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+.urgent-pulse {
+  animation: urgentPulse 1.5s ease-in-out infinite;
+}
+
+/* Tracking: subtle "settled into place" fade when the timeline debounce fires */
+@keyframes cpFade {
+  from { opacity: 0.7; transform: translateY(2px); }
+  to   { opacity: 1;   transform: translateY(0); }
+}
+.cp-fade {
+  animation: cpFade 200ms ease-out;
+}

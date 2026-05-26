@@ -23,8 +23,10 @@ const inputStyle: React.CSSProperties = {
 }
 
 export default function OnboardingScreen({ onSubmit }: OnboardingScreenProps) {
-  const [name, setName]         = useState('')
-  const [password, setPassword] = useState('')
+  // Pre-filled mock data — resets to these defaults whenever this screen
+  // remounts (e.g. after sign-out → splash → onboarding).
+  const [name, setName]         = useState('fiona')
+  const [password, setPassword] = useState('password123')
 
   const canSubmit = name.trim().length >= 2
 

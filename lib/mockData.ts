@@ -46,16 +46,16 @@ export interface ScanHistoryEntry {
 }
 
 export const scanHistory: ScanHistoryEntry[] = [
-  { id: 0, date: 'Today',        stats: '11/14 clean · 2 plaque · 1 gum care', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
-  { id: 1, date: '6 days ago',   stats: '12/14 clean · 1 plaque · 1 gum care', dotType: 'half',    clean: 12, total: 14, plaque: 1, gumCare: 1 },
-  { id: 2, date: '2 weeks ago',  stats: '10/14 clean · 3 plaque · 1 gum care', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
-  { id: 3, date: '3 weeks ago',  stats: '11/14 clean · 2 plaque · 1 gum care', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
-  { id: 4, date: '1 month ago',  stats: '13/14 clean · 1 plaque · 0 gum care', dotType: 'filled',  clean: 13, total: 14, plaque: 1, gumCare: 0 },
-  { id: 5, date: '5 weeks ago',  stats: '12/14 clean · 2 plaque · 0 gum care', dotType: 'half',    clean: 12, total: 14, plaque: 2, gumCare: 0 },
-  { id: 6, date: '6 weeks ago',  stats: '10/14 clean · 3 plaque · 1 gum care', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
-  { id: 7, date: '2 months ago', stats: '9/14 clean · 4 plaque · 1 gum care',  dotType: 'outline', clean:  9, total: 14, plaque: 4, gumCare: 1 },
-  { id: 8, date: '10 weeks ago', stats: '11/14 clean · 2 plaque · 1 gum care', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
-  { id: 9, date: '3 months ago', stats: '10/14 clean · 3 plaque · 1 gum care', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
+  { id: 0, date: 'Today',        stats: '11/14 clean · 2 plaque · 1 gum inflamed', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
+  { id: 1, date: '6 days ago',   stats: '12/14 clean · 1 plaque · 1 gum inflamed', dotType: 'half',    clean: 12, total: 14, plaque: 1, gumCare: 1 },
+  { id: 2, date: '2 weeks ago',  stats: '10/14 clean · 3 plaque · 1 gum inflamed', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
+  { id: 3, date: '3 weeks ago',  stats: '11/14 clean · 2 plaque · 1 gum inflamed', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
+  { id: 4, date: '1 month ago',  stats: '13/14 clean · 1 plaque · 0 gum inflamed', dotType: 'filled',  clean: 13, total: 14, plaque: 1, gumCare: 0 },
+  { id: 5, date: '5 weeks ago',  stats: '12/14 clean · 2 plaque · 0 gum inflamed', dotType: 'half',    clean: 12, total: 14, plaque: 2, gumCare: 0 },
+  { id: 6, date: '6 weeks ago',  stats: '10/14 clean · 3 plaque · 1 gum inflamed', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
+  { id: 7, date: '2 months ago', stats: '9/14 clean · 4 plaque · 1 gum inflamed',  dotType: 'outline', clean:  9, total: 14, plaque: 4, gumCare: 1 },
+  { id: 8, date: '10 weeks ago', stats: '11/14 clean · 2 plaque · 1 gum inflamed', dotType: 'half',    clean: 11, total: 14, plaque: 2, gumCare: 1 },
+  { id: 9, date: '3 months ago', stats: '10/14 clean · 3 plaque · 1 gum inflamed', dotType: 'outline', clean: 10, total: 14, plaque: 3, gumCare: 1 },
 ]
 
 // Tab 3 — Camera Drafts
@@ -64,14 +64,16 @@ export interface Draft {
   label: string
   src: string
   type: 'photo' | 'video'
+  // Time remaining before auto-deletion (mock value rendered as a pill).
+  countdown: string
 }
 export const drafts: Draft[] = [
-  { id: 0, label: 'POV moment', src: '/draft-01.jpg', type: 'photo' },
-  { id: 1, label: 'POV moment', src: '/draft-02.jpg', type: 'video' },
-  { id: 2, label: 'POV moment', src: '/draft-03.jpg', type: 'photo' },
-  { id: 3, label: 'POV moment', src: '/draft-04.jpg', type: 'video' },
-  { id: 4, label: 'POV moment', src: '/draft-05.jpg', type: 'photo' },
-  { id: 5, label: 'POV moment', src: '/draft-06.jpg', type: 'video' },
+  { id: 0, label: 'POV moment', src: '/draft-01.jpg', type: 'photo', countdown: '22h' },
+  { id: 1, label: 'POV moment', src: '/draft-02.jpg', type: 'video', countdown: '18h' },
+  { id: 2, label: 'POV moment', src: '/draft-03.jpg', type: 'photo', countdown: '14h' },
+  { id: 3, label: 'POV moment', src: '/draft-04.jpg', type: 'video', countdown: '9h'  },
+  { id: 4, label: 'POV moment', src: '/draft-05.jpg', type: 'photo', countdown: '5h'  },
+  { id: 5, label: 'POV moment', src: '/draft-06.jpg', type: 'video', countdown: '2h'  },
 ]
 
 // Tab 4 — Support

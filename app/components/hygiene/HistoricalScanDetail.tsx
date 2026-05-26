@@ -64,7 +64,7 @@ function TeethZones() {
       >
         <span style={{ width: 26, height: '0.5px', background: 'rgba(0,0,0,0.25)', display: 'block' }} />
         <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1px', color: '#5FA4A4' }}>
-          GUM CARE
+          GUM INFLAMED
         </span>
       </div>
     </div>
@@ -129,7 +129,7 @@ export default function HistoricalScanDetail({ scan, onBack }: HistoricalScanDet
       <div style={{ display: 'flex', gap: 8, padding: '12px 24px 0' }}>
         <StatCard label="CLEAN"    value={`${scan.clean}/${scan.total}`} bg="#FFD9E5" />
         <StatCard label="PLAQUE"   value={String(scan.plaque)}           bg="#EFE0FF" />
-        <StatCard label="GUM CARE" value={String(scan.gumCare)}          bg="#E0EEEE" />
+        <StatCard label="GUM INFLAMED" value={String(scan.gumCare)}          bg="#E0EEEE" />
       </div>
 
       {/* Insight card — bold iridescent */}

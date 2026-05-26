@@ -42,9 +42,8 @@ import ScanHistory          from '@/app/components/hygiene/ScanHistory'
 import HistoricalScanDetail from '@/app/components/hygiene/HistoricalScanDetail'
 
 // ── Camera (tab 3) ─────────────────────────────────────────────────────────────
-import CameraDisarmed from '@/app/components/camera/CameraDisarmed'
-import CameraArmed    from '@/app/components/camera/CameraArmed'
-import Drafts         from '@/app/components/camera/Drafts'
+import CameraScreen from '@/app/components/camera/CameraDisarmed'
+import Drafts       from '@/app/components/camera/Drafts'
 
 // ── Support (tab 4) ────────────────────────────────────────────────────────────
 import SupportHome          from '@/app/components/support/SupportHome'
@@ -56,7 +55,7 @@ import TbdScreen            from '@/app/components/support/TbdScreen'
 
 type AppScreen  = 'splash' | 'onboarding' | 'welcome' | 'main'
 type HygieneSub = 'home' | 'scanning' | 'result' | 'detail' | 'history' | 'historyDetail'
-type CameraSub  = 'disarmed' | 'armed' | 'drafts'
+type CameraSub  = 'home' | 'drafts'
 type SupportSub = 'home' | 'profile' | 'changePassword' | 'tbd'
 
 // ── Root component ─────────────────────────────────────────────────────────────
@@ -69,8 +68,7 @@ export default function Home() {
   // ── Main-app nav state ─────────────────────────────────────────────────────
   const [activeTab,  setActiveTab]  = useState<Tab>('tracking')
   const [hygieneSub, setHygieneSub] = useState<HygieneSub>('home')
-  const [cameraSub,  setCameraSub]  = useState<CameraSub>('disarmed')
-  const [cameraArmed, setCameraArmed] = useState(false)
+  const [cameraSub,  setCameraSub]  = useState<CameraSub>('home')
 
   // ── Overlay / modal state ──────────────────────────────────────────────────
   const [showCalibration,    setShowCalibration]    = useState(false)
@@ -121,7 +119,7 @@ export default function Home() {
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab)
     if (tab === 'hygiene') setHygieneSub('home')
-    if (tab === 'camera')  setCameraSub(cameraArmed ? 'armed' : 'disarmed')
+    if (tab === 'camera')  setCameraSub('home')
     if (tab === 'support') setSupportSub('home')
   }
 
@@ -129,8 +127,7 @@ export default function Home() {
   const handleSignOut = () => {
     setUserName('')
     setHasSeenCalibration(false)
-    setCameraArmed(false)
-    setCameraSub('disarmed')
+    setCameraSub('home')
     setActiveTab('tracking')
     setHygieneSub('home')
     setSupportSub('home')
@@ -150,16 +147,6 @@ export default function Home() {
   const handleFaceScanComplete = () => {
     setShowFaceScan(false)
     // Land on clean Tracking Home — no modal
-  }
-
-  // ── Camera arm / disarm ────────────────────────────────────────────────────
-  const handleArm = (_duration: string) => {
-    setCameraArmed(true)
-    setCameraSub('armed')
-  }
-  const handleDisarm = () => {
-    setCameraArmed(false)
-    setCameraSub('disarmed')
   }
 
   // ── Tab bar: hidden during active scan, face scan overlay, change password ──
@@ -212,17 +199,12 @@ export default function Home() {
 
     // Tab 3 — Camera
     if (activeTab === 'camera') {
-      if (cameraSub === 'disarmed') return <CameraDisarmed onArm={handleArm} />
-      if (cameraSub === 'armed')    return (
-        <CameraArmed
-          onDisarm={handleDisarm}
-          onViewDrafts={() => setCameraSub('drafts')}
-          draftsCount={draftsCount}
-        />
+      if (cameraSub === 'home')   return (
+        <CameraScreen onViewDrafts={() => setCameraSub('drafts')} />
       )
-      if (cameraSub === 'drafts')   return (
+      if (cameraSub === 'drafts') return (
         <Drafts
-          onBack={() => setCameraSub('armed')}
+          onBack={() => setCameraSub('home')}
           draftsCount={draftsCount}
           onClearAll={() => setDraftsCount(0)}
         />

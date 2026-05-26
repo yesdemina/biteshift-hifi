@@ -59,7 +59,7 @@ export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeP
               whiteSpace: 'nowrap',
             }}
           >
-            your hygiene, mapped
+            let&apos;s check in
           </h1>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeP
         {/* Last result inline strip */}
         {hasScans && (
           <p style={{ marginTop: 16, fontSize: 12, color: '#666666', textAlign: 'center' }}>
-            last result: {clean}/{total} clean · {plaque} plaque · {gumCare} gum care
+            last result: {clean}/{total} clean · {plaque} plaque · {gumCare} gum inflamed
           </p>
         )}
 
