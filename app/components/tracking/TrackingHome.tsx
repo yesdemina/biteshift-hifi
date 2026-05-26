@@ -1,20 +1,132 @@
 'use client'
-// Screen 1a — Tracking Home
-// Interactive timeline with 4 control points (Day 0 / Past / Today / Forecast).
-// Numbers interpolate smoothly with the handle; text labels settle after a 300ms debounce.
+// Screen 1a — Tracking Home v4
+// Stable layout: every slot has a fixed height so nothing shifts between
+// timeline positions. 5 control points (day0/past/today/future/forecast),
+// 20 past + 10 future milestones, with nearest-milestone lookup on debounce.
 
 import { useState, useRef, useEffect } from 'react'
 
-type CP = 'day0' | 'past' | 'today' | 'forecast'
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const ANCHORS: { id: CP; pos: number; dayValue: number; label: string }[] = [
-  { id: 'day0',     pos: 0.00, dayValue: 0,   label: 'DAY 0' },
-  { id: 'past',     pos: 0.33, dayValue: 100, label: 'PAST' },
-  { id: 'today',    pos: 0.66, dayValue: 142, label: 'TODAY' },
-  { id: 'forecast', pos: 1.00, dayValue: 240, label: 'FORECAST' },
+type CP = 'day0' | 'past' | 'today' | 'future' | 'forecast'
+
+interface Milestone {
+  day: number
+  text: string
+}
+
+// ── Milestone data ────────────────────────────────────────────────────────────
+
+const pastMilestones: Milestone[] = [
+  { day: 1,   text: 'brackets bonded · first day of treatment' },
+  { day: 7,   text: 'initial soreness easing · adjusting phase' },
+  { day: 14,  text: 'first arch wire engaged · gentle pressure begins' },
+  { day: 21,  text: 'upper incisors started rotating' },
+  { day: 30,  text: 'bracket pressure activated · 0.2 mm shift logged' },
+  { day: 38,  text: 'lower midline correction underway' },
+  { day: 45,  text: 'lower incisors aligning · midline correction in progress' },
+  { day: 55,  text: 'first elastic engagement · bite refinement starts' },
+  { day: 60,  text: 'upper bite gap reducing' },
+  { day: 70,  text: 'canine pressure phase begins' },
+  { day: 75,  text: 'canine rotation began' },
+  { day: 85,  text: 'rotation past halfway · upper right canine' },
+  { day: 90,  text: 'arch shape rounding out' },
+  { day: 100, text: 'spacing closed · lower arch' },
+  { day: 108, text: 'overbite reduced · 1.2 mm vertical correction' },
+  { day: 115, text: 'molar tipping correction underway' },
+  { day: 120, text: 'upper canine rotation complete' },
+  { day: 128, text: 'lower premolar alignment finished' },
+  { day: 135, text: 'refined wire engaged · finishing phase nearing' },
+  { day: 141, text: 'yesterday · 0.1 mm overnight shift' },
 ]
 
-interface CardSpec {
+const futureMilestones: Milestone[] = [
+  { day: 150, text: 'next week · upper bite refinement' },
+  { day: 165, text: 'month 6 milestone approaching' },
+  { day: 180, text: 'alignment milestone · 70% complete' },
+  { day: 195, text: 'wire size step-down · finishing phase' },
+  { day: 210, text: 'upper arch nearly settled' },
+  { day: 225, text: 'lower arch reaching target shape' },
+  { day: 240, text: 'refinement wires engaged' },
+  { day: 255, text: 'final positioning underway' },
+  { day: 263, text: 'last detail adjustments' },
+  { day: 270, text: 'projected completion · final adjustment' },
+]
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function nearestCP(p: number): CP {
+  if (p < 0.005) return 'day0'
+  if (p < 0.495) return 'past'
+  if (p < 0.825) return 'today'
+  if (p < 0.995) return 'future'
+  return 'forecast'
+}
+
+/** Piecewise linear: 0 → 0, 0.66 → 142, 1.0 → 270 */
+function interpolateDay(p: number): number {
+  if (p <= 0.66) return Math.round((p * 142) / 0.66)
+  return Math.round(142 + ((p - 0.66) * (270 - 142)) / (1.0 - 0.66))
+}
+
+function nearestMilestone(arr: Milestone[], day: number): Milestone {
+  return arr.reduce((best, m) =>
+    Math.abs(m.day - day) < Math.abs(best.day - day) ? m : best
+  )
+}
+
+function pastMM(day: number): string {
+  // -2.8 mm at day 1, 0.0 mm at day 142
+  const mm = Math.max(0, ((142 - day) * 2.8) / 141)
+  return `-${mm.toFixed(1)} mm`
+}
+
+function futurePct(day: number): number {
+  // 60% at day 142, 92% at day 270
+  const pct = 60 + ((day - 142) * 32) / 128
+  return Math.max(60, Math.min(92, Math.round(pct)))
+}
+
+// ── State-derived text ────────────────────────────────────────────────────────
+
+function dayCounterLabel(cp: CP): string {
+  switch (cp) {
+    case 'day0':     return 'START'
+    case 'past':     return 'PAST'
+    case 'today':    return 'TODAY'
+    case 'future':   return 'FORECAST'
+    case 'forecast': return 'FORECAST'
+  }
+}
+
+function pillText(cp: CP, m: Milestone | null): string {
+  switch (cp) {
+    case 'day0':     return 'day 0 · where it began'
+    case 'today':    return 'day 142 of treatment'
+    case 'forecast': return 'forecast · 9 months ahead'
+    case 'past': {
+      const day = m ? m.day : 100
+      return `day ${day} · ${142 - day} days ago`
+    }
+    case 'future': {
+      const day = m ? m.day : 200
+      const months = Math.max(1, Math.round((day - 142) / 30))
+      return `day ${day} · ${months} months from now`
+    }
+  }
+}
+
+function headlineText(cp: CP): string {
+  switch (cp) {
+    case 'day0':     return 'how it started'
+    case 'past':     return 'how it was'
+    case 'today':    return 'your smile, mid-shift'
+    case 'future':   return 'how it will be'
+    case 'forecast': return 'the projected you'
+  }
+}
+
+interface CardData {
   label: string
   value: string
   valueIsText: boolean
@@ -22,102 +134,84 @@ interface CardSpec {
   progress?: number
 }
 
-interface CPState {
-  pill: string
-  headline: string
-  dayPrefix: 'day' | 'month'
-  dayRightLabel: string
-  card1: CardSpec
-  card1Gradient: string
-  card2: CardSpec
-  card2Gradient: string
+function card1Data(cp: CP, liveDay: number): CardData {
+  switch (cp) {
+    case 'day0':     return { label: 'STARTED',  value: 'baseline',    valueIsText: true,  subtext: 'initial alignment' }
+    case 'past':     return { label: 'VS TODAY', value: pastMM(liveDay), valueIsText: false, subtext: 'total movement since this point' }
+    case 'today':    return { label: 'THIS WEEK', value: '0.4 mm',     valueIsText: false, subtext: 'lower right canine moved' }
+    case 'future':   return { label: 'PREDICTED', value: `${futurePct(liveDay)}%`, valueIsText: false, subtext: 'alignment complete' }
+    case 'forecast': return { label: 'PREDICTED', value: '92%',        valueIsText: false, subtext: 'alignment complete' }
+  }
+}
+
+function card2Data(cp: CP, m: Milestone | null): CardData {
+  switch (cp) {
+    case 'day0':     return { label: 'GOAL',        value: 'final smile',   valueIsText: true,  subtext: 'your ideal target' }
+    case 'past':     return { label: 'MILESTONE',   value: m ? m.text : '', valueIsText: true }
+    case 'today':    return { label: 'AI FORECAST', value: '7-9 months',    valueIsText: false, subtext: 'until your final smile', progress: 0.60 }
+    case 'future':   return { label: 'MILESTONE',   value: m ? m.text : '', valueIsText: true }
+    case 'forecast': return { label: 'CONFIDENCE',  value: 'high',          valueIsText: true,  subtext: '± 3 weeks' }
+  }
 }
 
 const PINK_GRADIENT     = 'linear-gradient(135deg, #FFD9E5 0%, #EFE0FF 100%)'
 const LAVENDER_GRADIENT = 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)'
 
-const CP_STATES: Record<CP, CPState> = {
-  day0: {
-    pill: 'day 0 · where it began',
-    headline: 'how it started',
-    dayPrefix: 'day',
-    dayRightLabel: 'START',
-    card1:        { label: 'STARTED', value: 'baseline',    valueIsText: true, subtext: 'initial alignment baseline' },
-    card1Gradient: PINK_GRADIENT,
-    card2:        { label: 'GOAL',    value: 'final smile', valueIsText: true, subtext: 'your ideal target', progress: 0 },
-    card2Gradient: LAVENDER_GRADIENT,
-  },
-  past: {
-    pill: 'day 100 · 42 days ago',
-    headline: 'how it was',
-    dayPrefix: 'day',
-    dayRightLabel: 'PAST',
-    card1:        { label: 'VS TODAY',  value: '-2.1 mm',       valueIsText: false, subtext: 'total movement since this point' },
-    card1Gradient: PINK_GRADIENT,
-    card2:        { label: 'MILESTONE', value: 'spacing closed', valueIsText: true },
-    card2Gradient: LAVENDER_GRADIENT,
-  },
-  today: {
-    pill: 'day 142 of treatment',
-    headline: 'your smile, mid-shift',
-    dayPrefix: 'day',
-    dayRightLabel: 'TODAY',
-    card1:        { label: 'THIS WEEK',   value: '0.4 mm',      valueIsText: false, subtext: 'lower right canine moved' },
-    card1Gradient: PINK_GRADIENT,
-    card2:        { label: 'AI FORECAST', value: '7-9 months',  valueIsText: false, subtext: 'until your final smile', progress: 0.60 },
-    card2Gradient: LAVENDER_GRADIENT,
-  },
-  forecast: {
-    pill: 'forecast · 6 months from now',
-    headline: 'how it will be',
-    dayPrefix: 'month',
-    dayRightLabel: 'FORECAST',
-    card1:        { label: 'PREDICTED',  value: '92%', valueIsText: false, subtext: 'alignment complete' },
-    card1Gradient: PINK_GRADIENT,
-    card2:        { label: 'CONFIDENCE', value: 'high', valueIsText: true, subtext: '± 3 weeks', progress: 0.95 },
-    card2Gradient: LAVENDER_GRADIENT,
-  },
-}
-
-function nearestCP(p: number): CP {
-  if (p < 0.165) return 'day0'
-  if (p < 0.495) return 'past'
-  if (p < 0.825) return 'today'
-  return 'forecast'
-}
-
-/** Linear interpolation across the 4 anchor day values based on position 0–1. */
-function interpolateDayValue(p: number): number {
-  if (p <= 0.33) return Math.round(0   + (100 - 0)   * (p / 0.33))
-  if (p <= 0.66) return Math.round(100 + (142 - 100) * ((p - 0.33) / 0.33))
-  return            Math.round(142 + (240 - 142) * ((p - 0.66) / 0.34))
-}
-
 // ── Stat card ─────────────────────────────────────────────────────────────────
 
-function StatCard({
-  label, value, valueIsText, subtext, gradient, progress,
-}: CardSpec & { gradient: string }) {
+function StatCard({ data, gradient }: { data: CardData; gradient: string }) {
+  const { label, value, valueIsText, subtext, progress } = data
   return (
-    <div className="cp-fade" style={{ flex: 1, background: gradient, borderRadius: 20, padding: 14 }}>
-      <div style={{ fontSize: 9, color: '#666666', fontWeight: 600, letterSpacing: '0.08em', marginBottom: 6 }}>
-        {label}
-      </div>
+    <div
+      className="cp-fade"
+      style={{
+        flex: 1,
+        height: 110,
+        background: gradient,
+        borderRadius: 20,
+        padding: 14,
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
       <div
         style={{
-          fontSize: valueIsText ? 18 : 22,
-          fontWeight: valueIsText ? 600 : 700,
+          fontSize: 9,
+          color: '#666666',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+          marginBottom: 6,
+          flexShrink: 0,
+        }}
+      >
+        {label}
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          fontSize: valueIsText ? (value.length > 14 ? 13 : 18) : 22,
+          fontWeight: valueIsText && value.length > 14 ? 500 : valueIsText ? 600 : 700,
           color: '#000000',
-          lineHeight: 1.15,
+          lineHeight: valueIsText && value.length > 14 ? 1.3 : 1.15,
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: 'hidden',
         }}
       >
         {value}
       </div>
+
       {subtext && (
-        <div style={{ fontSize: 11, color: '#666666', marginTop: 5, lineHeight: 1.3 }}>
+        <div style={{ fontSize: 11, color: '#666666', lineHeight: 1.3, flexShrink: 0, marginTop: 4 }}>
           {subtext}
         </div>
       )}
+
       {progress !== undefined && (
         <div
           style={{
@@ -127,6 +221,7 @@ function StatCard({
             border: '0.5px solid rgba(0,0,0,0.08)',
             borderRadius: 999,
             boxSizing: 'border-box',
+            flexShrink: 0,
           }}
         >
           <div
@@ -146,33 +241,41 @@ function StatCard({
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function TrackingHome() {
-  // Normalised 0–1 handle position
-  const [handlePosition, setHandlePosition]       = useState(0.66)
-  const [activeControlPoint, setActiveControlPoint] = useState<CP>('today')
-  const [dragging, setDragging] = useState(false)
+  const [handlePosition, setHandlePosition]     = useState(0.66)
+  const [activeCP, setActiveCP]                 = useState<CP>('today')
+  const [activeMilestone, setActiveMilestone]   = useState<Milestone | null>(null)
+  const [dragging, setDragging]                 = useState(false)
+
   const isDragging  = useRef(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const trackRef    = useRef<HTMLDivElement>(null)
 
-  // Schedule a debounced control-point update 300ms after the last move
-  const scheduleCPUpdate = (p: number) => {
+  // Debounced state update — discrete text settles 300ms after the last move.
+  const scheduleUpdate = (p: number) => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      setActiveControlPoint((prev) => {
-        const next = nearestCP(p)
-        return next === prev ? prev : next
-      })
+      const cp = nearestCP(p)
+      setActiveCP((prev) => (cp === prev ? prev : cp))
+      const day = interpolateDay(p)
+      if (cp === 'past') {
+        setActiveMilestone(nearestMilestone(pastMilestones, day))
+      } else if (cp === 'future') {
+        setActiveMilestone(nearestMilestone(futureMilestones, day))
+      } else {
+        setActiveMilestone(null)
+      }
     }, 300)
   }
 
   const positionFromClientX = (clientX: number): number => {
     if (!trackRef.current) return handlePosition
     const { left, width } = trackRef.current.getBoundingClientRect()
+    if (width === 0) return handlePosition
     return Math.max(0, Math.min(1, (clientX - left) / width))
   }
 
-  // INSIGHT mount/unmount with 200ms fade in/out
-  const isToday = activeControlPoint === 'today'
+  // INSIGHT slot — card fades in/out 200ms; slot itself is always 88px.
+  const isToday = activeCP === 'today'
   const [insightMounted, setInsightMounted] = useState(isToday)
   const [insightOpacity, setInsightOpacity] = useState(isToday ? 1 : 0)
   useEffect(() => {
@@ -194,100 +297,105 @@ export default function TrackingHome() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }, [])
 
-  const state         = CP_STATES[activeControlPoint]
-  const dayValue      = interpolateDayValue(handlePosition)
-  const displayNumber = state.dayPrefix === 'month' ? Math.max(1, Math.round(dayValue / 30)) : dayValue
+  // Live values
+  const liveDay = interpolateDay(handlePosition)
+  const c1      = card1Data(activeCP, liveDay)
+  const c2      = card2Data(activeCP, activeMilestone)
+  const pill    = pillText(activeCP, activeMilestone)
+  const head    = headlineText(activeCP)
+  const dayLbl  = dayCounterLabel(activeCP)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
-      {/* ── Top: pill + headline (anchored, debounced) ── */}
-      <div style={{ flexShrink: 0, padding: '16px 24px 0' }}>
-        <div
-          key={`pill-${activeControlPoint}`}
-          className="cp-fade"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            background: '#FFD9E5',
-            borderRadius: 999,
-            padding: '6px 14px',
-            fontSize: 12,
-            fontWeight: 500,
-            color: '#000000',
-          }}
-        >
-          {state.pill}
-        </div>
-        <h1
-          key={`h-${activeControlPoint}`}
-          className="cp-fade"
-          style={{
-            marginTop: 12,
-            fontSize: 20,
-            fontWeight: 700,
-            color: '#000000',
-            letterSpacing: '-0.5px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {state.headline}
-        </h1>
-      </div>
+      <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column' }}>
 
-      {/* ── Centered content group ── */}
-      <div
-        style={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
-        {/* Hero */}
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+        {/* Pill slot — fixed 28 */}
+        <div style={{ height: 28, display: 'flex', alignItems: 'center' }}>
+          <div
+            key={`pill-${activeCP}-${activeMilestone?.day ?? 'x'}`}
+            className="cp-fade"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: '#FFD9E5',
+              borderRadius: 999,
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 500,
+              color: '#000000',
+            }}
+          >
+            {pill}
+          </div>
+        </div>
+
+        {/* Headline slot — fixed 32 */}
+        <div style={{ height: 32, marginTop: 8, display: 'flex', alignItems: 'center' }}>
+          <h1
+            key={`h-${activeCP}`}
+            className="cp-fade"
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: '#000000',
+              letterSpacing: '-0.5px',
+              whiteSpace: 'nowrap',
+              lineHeight: 1,
+            }}
+          >
+            {head}
+          </h1>
+        </div>
+
+        {/* Photo slot — fixed 320 */}
+        <div
+          style={{
+            height: 320,
+            marginTop: 8,
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <div
             style={{
-              position: 'absolute', top: '50%', left: '50%',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: 200, height: 200, borderRadius: '50%',
-              background: 'rgba(255,179,209,0.4)', filter: 'blur(60px)', pointerEvents: 'none',
+              width: 240,
+              height: 240,
+              borderRadius: '50%',
+              background: 'rgba(255,179,209,0.4)',
+              filter: 'blur(60px)',
+              pointerEvents: 'none',
             }}
           />
           <img
             src="/user.png"
             alt="Your smile"
-            style={{ position: 'relative', width: 240, height: 'auto', display: 'block' }}
+            style={{
+              position: 'relative',
+              maxHeight: '100%',
+              maxWidth: '100%',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+            }}
           />
         </div>
 
-        {/* Timeline */}
-        <div style={{ width: '100%', padding: '0 24px', marginTop: 16 }}>
-          {/* Track */}
+        {/* Timeline slot — fixed ~48 */}
+        <div style={{ marginTop: 8 }}>
+          {/* Track — no anchor dots, just the line + handle */}
           <div
             ref={trackRef}
             style={{ position: 'relative', height: 18, display: 'flex', alignItems: 'center' }}
           >
             <div style={{ width: '100%', height: 2, background: '#FFB3D1', borderRadius: 999 }} />
 
-            {ANCHORS.map((a) => (
-              <div
-                key={a.id}
-                style={{
-                  position: 'absolute',
-                  left: `${a.pos * 100}%`,
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 6, height: 6,
-                  borderRadius: '50%',
-                  background: '#FFB3D1',
-                  pointerEvents: 'none',
-                }}
-              />
-            ))}
-
-            {/* Draggable handle */}
             <div
               style={{
                 position: 'absolute',
@@ -317,13 +425,13 @@ export default function TrackingHome() {
                 if (!isDragging.current) return
                 const p = positionFromClientX(e.clientX)
                 setHandlePosition(p)
-                scheduleCPUpdate(p)
+                scheduleUpdate(p)
               }}
               onPointerUp={(e) => {
                 e.currentTarget.releasePointerCapture(e.pointerId)
                 isDragging.current = false
                 setDragging(false)
-                scheduleCPUpdate(handlePosition)
+                scheduleUpdate(handlePosition)
               }}
               onPointerCancel={() => {
                 isDragging.current = false
@@ -332,15 +440,14 @@ export default function TrackingHome() {
             />
           </div>
 
-          {/* Anchor labels */}
+          {/* 3 labels: DAY 0 / TODAY / FORECAST */}
           <div style={{ position: 'relative', height: 14, marginTop: 10 }}>
-            {ANCHORS.map((a, i) => {
-              const active = activeControlPoint === a.id
-              const tx = i === 0
-                ? '0%'
-                : i === ANCHORS.length - 1
-                  ? '-100%'
-                  : '-50%'
+            {([
+              { id: 'day0',     pos: 0,    label: 'DAY 0',    tx: '0%'   },
+              { id: 'today',    pos: 0.66, label: 'TODAY',    tx: '-50%' },
+              { id: 'forecast', pos: 1,    label: 'FORECAST', tx: '-100%' },
+            ] as const).map((a) => {
+              const active = activeCP === a.id
               const isTodayLabel = a.id === 'today'
               return (
                 <span
@@ -350,7 +457,8 @@ export default function TrackingHome() {
                       ? () => {
                           if (debounceRef.current) clearTimeout(debounceRef.current)
                           setHandlePosition(0.66)
-                          setActiveControlPoint('today')
+                          setActiveCP('today')
+                          setActiveMilestone(null)
                         }
                       : undefined
                   }
@@ -358,8 +466,8 @@ export default function TrackingHome() {
                     position: 'absolute',
                     left: `${a.pos * 100}%`,
                     top: 0,
-                    transform: `translateX(${tx})`,
-                    fontSize: 9,
+                    transform: `translateX(${a.tx})`,
+                    fontSize: 10,
                     letterSpacing: '0.08em',
                     color: active ? '#000000' : '#999999',
                     fontWeight: active ? 600 : 400,
@@ -375,8 +483,17 @@ export default function TrackingHome() {
           </div>
         </div>
 
-        {/* Day line — number interpolates in real time, label settles on debounce */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 16 }}>
+        {/* Day counter slot — fixed 32 */}
+        <div
+          style={{
+            height: 32,
+            marginTop: 12,
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'center',
+            gap: 6,
+          }}
+        >
           <span
             style={{
               fontSize: 24,
@@ -386,55 +503,35 @@ export default function TrackingHome() {
               lineHeight: 1,
             }}
           >
-            {state.dayPrefix} {displayNumber}
+            day {liveDay}
           </span>
           <span
-            key={`dl-${activeControlPoint}`}
+            key={`dl-${activeCP}`}
             className="cp-fade"
-            style={{ fontSize: 9, fontWeight: 600, color: '#999999', letterSpacing: '0.5px' }}
+            style={{ fontSize: 9, fontWeight: 600, color: '#999999', letterSpacing: '0.08em' }}
           >
-            {state.dayRightLabel}
+            {dayLbl}
           </span>
         </div>
 
-        {/* Stat cards */}
-        <div style={{ display: 'flex', gap: 10, marginTop: 24, width: '100%', padding: '0 24px' }}>
-          <StatCard
-            key={`c1-${activeControlPoint}`}
-            label={state.card1.label}
-            value={state.card1.value}
-            valueIsText={state.card1.valueIsText}
-            subtext={state.card1.subtext}
-            progress={state.card1.progress}
-            gradient={state.card1Gradient}
-          />
-          <StatCard
-            key={`c2-${activeControlPoint}`}
-            label={state.card2.label}
-            value={state.card2.value}
-            valueIsText={state.card2.valueIsText}
-            subtext={state.card2.subtext}
-            progress={state.card2.progress}
-            gradient={state.card2Gradient}
-          />
+        {/* Card row — fixed 110 */}
+        <div style={{ display: 'flex', gap: 12, height: 110, marginTop: 12 }}>
+          <StatCard key={`c1-${activeCP}`} data={c1} gradient={PINK_GRADIENT} />
+          <StatCard key={`c2-${activeCP}-${activeMilestone?.day ?? 'x'}`} data={c2} gradient={LAVENDER_GRADIENT} />
         </div>
 
-        {/* INSIGHT card — only when Today; fades in/out 200ms */}
-        {insightMounted && (
-          <div
-            style={{
-              width: '100%',
-              marginTop: 24,
-              padding: '0 24px',
-              opacity: insightOpacity,
-              transition: 'opacity 200ms ease',
-            }}
-          >
+        {/* INSIGHT slot — fixed 88, content conditional on today */}
+        <div style={{ height: 88, marginTop: 20 }}>
+          {insightMounted && (
             <div
               style={{
+                height: '100%',
+                opacity: insightOpacity,
+                transition: 'opacity 200ms ease',
                 background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',
                 borderRadius: 20,
-                padding: 20,
+                padding: 16,
+                boxSizing: 'border-box',
               }}
             >
               <div
@@ -452,8 +549,8 @@ export default function TrackingHome() {
                 on pace with your treatment plan
               </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
