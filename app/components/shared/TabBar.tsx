@@ -1,5 +1,5 @@
-// TabBar — floating white pill at the bottom of the PhoneFrame.
-// Filled icons; the active tab sits in a soft-pink pill.
+// TabBar — full-width neumorphic embossed bar flush with the PhoneFrame bottom.
+// The whole bar reads as raised; the active tab is debossed (recessed) into it.
 
 export type Tab = 'tracking' | 'hygiene' | 'camera' | 'support'
 
@@ -71,17 +71,16 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
       style={{
         position: 'absolute',
         bottom: 16,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        height: 56,
+        left: 16,
+        right: 16,
+        height: 64,
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '0 12px',
+        justifyContent: 'space-around',
         background: '#FFFFFF',
-        border: '0.5px solid rgba(0,0,0,0.08)',
         borderRadius: 999,
-        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        boxShadow:
+          '0 8px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.03)',
       }}
     >
       {TABS.map(({ id, Icon }) => {
@@ -92,8 +91,8 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
             onClick={() => onTabChange(id)}
             aria-label={id}
             style={{
-              width: 56,
-              height: 56,
+              flex: 1,
+              height: 64,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -106,14 +105,17 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
           >
             <div
               style={{
-                width: 56,
-                height: 40,
+                width: 72,
+                height: 36,
                 borderRadius: 999,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: active ? '#F0F0F0' : 'transparent',
-                transition: 'background-color 200ms ease',
+                background: '#FFFFFF',
+                boxShadow: active
+                  ? 'inset 3px 3px 6px rgba(0,0,0,0.10), inset -3px -3px 6px rgba(255,255,255,0.85)'
+                  : 'inset 0 0 0 rgba(0,0,0,0)',
+                transition: 'box-shadow 200ms ease',
               }}
             >
               <span
