@@ -21,10 +21,10 @@ function Pill({ children }: { children: React.ReactNode }) {
         gap: 6,
         background: '#FFD9E5',
         borderRadius: 999,
-        padding: '5px 12px',
-        fontSize: 12,
+        padding: '4px 12px',
+        fontSize: 11,
         color: '#000000',
-        fontWeight: 600,
+        fontWeight: 500,
       }}
     >
       {children}
@@ -37,9 +37,29 @@ export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeP
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
-      {/* ── Top: pill + headline (anchored) ── */}
-      <div style={{ flexShrink: 0 }}>
-        <div style={{ padding: '14px 24px 0' }}>
+      {/* ── Top: centered headline + pill (anchored) ── */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '14px 24px 0',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 22,
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '-0.4px',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          let&apos;s check in
+        </h1>
+        <div style={{ marginTop: 8 }}>
           {hasScans ? (
             <Pill>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#000000', display: 'inline-block' }} />
@@ -48,19 +68,6 @@ export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeP
           ) : (
             <Pill>no scans yet</Pill>
           )}
-        </div>
-        <div style={{ padding: '12px 24px 0' }}>
-          <h1
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: '#000000',
-              letterSpacing: '-0.5px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            let&apos;s check in
-          </h1>
         </div>
       </div>
 

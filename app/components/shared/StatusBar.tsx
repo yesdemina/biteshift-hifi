@@ -1,7 +1,8 @@
 // StatusBar — iOS-style top bar: time left, signal/wifi/battery right.
-// Height: 44px. Always white background.
+// Height: 44px. White background by default; pass `transparent` to let the
+// content behind (e.g. the Tracking hero's pink halo) show through.
 
-export default function StatusBar() {
+export default function StatusBar({ transparent = false }: { transparent?: boolean }) {
   return (
     <div
       style={{
@@ -11,7 +12,7 @@ export default function StatusBar() {
         justifyContent: 'space-between',
         padding: '0 24px',
         flexShrink: 0,
-        background: '#FFFFFF',
+        background: transparent ? 'transparent' : '#FFFFFF',
       }}
     >
       {/* Time */}

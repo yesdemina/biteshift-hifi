@@ -157,6 +157,14 @@ body {
   transform: scale(0.98);
 }
 
+/* Subtle press feedback — opacity dip (Support Home reminders + supplies rows) */
+.press-dim {
+  transition: opacity 0.15s ease;
+}
+.press-dim:active {
+  opacity: 0.8;
+}
+
 /* Generic soft fade-in (toasts, halos) */
 @keyframes softIn {
   from { opacity: 0; transform: translateY(-6px); }

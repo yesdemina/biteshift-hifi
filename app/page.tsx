@@ -255,8 +255,17 @@ export default function Home() {
 
       {/* ── Main app ── */}
       {appScreen === 'main' && (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <StatusBar />
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Tracking hero bleeds its pink halo up behind the status bar, so the
+              bar is overlaid (transparent) and the scroller fills from the top.
+              Every other screen keeps the normal opaque white status bar. */}
+          {activeTab === 'tracking' ? (
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+              <StatusBar transparent />
+            </div>
+          ) : (
+            <StatusBar />
+          )}
           {/* paddingBottom reserves the floating tab bar's footprint so screen
               content keeps the same usable height and never hides behind it */}
           <div style={{ flex: 1, overflowY: 'auto', paddingBottom: showTabBar ? 72 : 0 }}>

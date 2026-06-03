@@ -83,33 +83,6 @@ function futurePct(day: number): number {
 
 // ── State-derived text ────────────────────────────────────────────────────────
 
-function pillText(cp: CP, m: Milestone | null): string {
-  switch (cp) {
-    case 'day0':     return 'day 0 · where it began'
-    case 'today':    return 'day 142 of treatment'
-    case 'forecast': return 'day 283 · final smile projected'
-    case 'past': {
-      const day = m ? m.day : 75
-      return `day ${day} · ${142 - day} days ago`
-    }
-    case 'future': {
-      const day = m ? m.day : 210
-      const months = Math.max(1, Math.round((day - 142) / 30))
-      return `day ${day} · ${months} months from now`
-    }
-  }
-}
-
-function headlineText(cp: CP): string {
-  switch (cp) {
-    case 'day0':     return 'how it started'
-    case 'past':     return 'how it was'
-    case 'today':    return 'your smile, mid-shift'
-    case 'future':   return 'how it will be'
-    case 'forecast': return 'how it will be'
-  }
-}
-
 // Card 1 = quantitative metric (label / value / subtext)
 function card1Data(cp: CP, liveDay: number): { label: string; value: string; subtext: string } {
   switch (cp) {
@@ -385,8 +358,8 @@ export default function TrackingHome() {
   const liveDay = interpolateDay(handlePosition)
   const c1      = card1Data(activeCP, liveDay)
   const c2Text  = card2Text(activeCP, activeMilestone)
-  const pill    = pillText(activeCP, activeMilestone)
-  const head    = headlineText(activeCP)
+  // Day counter sits inside the capsule once the fill is wide enough to hold it.
+  const dayInsideFill = liveDay >= 71
 
   const resetToToday = () => {
     stopSwing()
@@ -400,9 +373,13 @@ export default function TrackingHome() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#FFFFFF' }}>
 
-      {/* ── Hero face — full bleed, 450px, clean, pill + headline overlaid ── */}
-      <div style={{ position: 'relative', width: '100%', height: 450, flexShrink: 0, overflow: 'hidden' }}>
-        {/* Pink halo glow (scaled up, behind the image) */}
+      {/* ── Hero face — full bleed, extends up behind the (overlaid, transparent)
+          status bar so the pink halo blends seamlessly into the top of the
+          frame. Container = 450px face area + 44px status-bar band = 494px.
+          The face image is pushed down 44px so it stays in the exact same spot
+          as before; the halo fills the whole container, including the top band. ── */}
+      <div style={{ position: 'relative', width: '100%', height: 494, flexShrink: 0, overflow: 'hidden' }}>
+        {/* Pink halo glow (scaled up, behind the image) — fills to the top edge */}
         <div
           style={{
             position: 'absolute',
@@ -410,7 +387,7 @@ export default function TrackingHome() {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 420,
-            height: 420,
+            height: 460,
             borderRadius: '50%',
             background: 'rgba(255,179,209,0.4)',
             filter: 'blur(90px)',
@@ -422,61 +399,20 @@ export default function TrackingHome() {
           alt="Your smile"
           style={{
             position: 'absolute',
-            inset: 0,
+            top: 44,
+            left: 0,
+            right: 0,
+            height: 450,
             width: '100%',
-            height: '100%',
             objectFit: 'cover',
             objectPosition: 'center 50%',
             display: 'block',
+            // Dissolve the photo's top edge into the pink halo — no hard seam
+            // under the status bar.
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
+            maskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
           }}
         />
-        {/* White-to-transparent gradient over the top 30% for text legibility */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '30%',
-            background:
-              'linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 60%, transparent 100%)',
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Pill + headline overlay */}
-        <div style={{ position: 'absolute', top: 16, left: 24, right: 24 }}>
-          <div
-            key={`pill-${activeCP}-${activeMilestone?.day ?? 'x'}`}
-            className="cp-fade"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              background: '#FFD9E5',
-              borderRadius: 999,
-              padding: '6px 14px',
-              fontSize: 12,
-              fontWeight: 500,
-              color: '#000000',
-            }}
-          >
-            {pill}
-          </div>
-          <h1
-            key={`h-${activeCP}`}
-            className="cp-fade"
-            style={{
-              marginTop: 8,
-              fontSize: 22,
-              fontWeight: 700,
-              color: '#000000',
-              letterSpacing: '-0.5px',
-              whiteSpace: 'nowrap',
-              lineHeight: 1,
-            }}
-          >
-            {head}
-          </h1>
-        </div>
       </div>
 
       {/* ── Capsule slider area ── */}
@@ -548,6 +484,7 @@ export default function TrackingHome() {
           {/* Chevron tap targets */}
           <button
             aria-label="Jump to day 0"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => animateTo(0)}
             style={{
               position: 'absolute',
@@ -571,6 +508,7 @@ export default function TrackingHome() {
           </button>
           <button
             aria-label="Jump to forecast"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => animateTo(1)}
             style={{
               position: 'absolute',
@@ -592,6 +530,45 @@ export default function TrackingHome() {
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
+
+          {/* Day counter — rides the fill's right edge. Sits just outside the
+              fill on white while it's short (≤ day 70), then tucks inside the
+              fill near its right edge once there's room (≥ day 71). Clamped so
+              it never collides with either chevron. */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: dayInsideFill
+                ? `min(calc(${handlePosition * 100}% - 10px), calc(100% - 52px))`
+                : `max(calc(${handlePosition * 100}% + 10px), 52px)`,
+              transform: dayInsideFill
+                ? 'translate(-100%, -50%)'
+                : 'translate(0, -50%)',
+              transition: 'left 200ms ease, transform 200ms ease',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 3,
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span style={{ fontSize: 11, fontWeight: 400, color: '#000000', lineHeight: 1 }}>
+              day
+            </span>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: '#000000',
+                letterSpacing: '-0.4px',
+                lineHeight: 1,
+              }}
+            >
+              {liveDay}
+            </span>
+          </div>
         </div>
 
         {/* Labels below the capsule */}
@@ -647,35 +624,8 @@ export default function TrackingHome() {
       {/* ── Lower content (padded) — compacted to fit the viewport ── */}
       <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column' }}>
 
-        {/* Day counter slot — fixed 24, just `day {N}` (no state suffix) */}
-        <div
-          style={{
-            height: 24,
-            marginTop: 4,
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'center',
-            gap: 4,
-          }}
-        >
-          <span style={{ fontSize: 16, fontWeight: 400, color: '#999999', lineHeight: 1 }}>
-            day
-          </span>
-          <span
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: '#000000',
-              letterSpacing: '-0.6px',
-              lineHeight: 1,
-            }}
-          >
-            {liveDay}
-          </span>
-        </div>
-
         {/* Card row — fixed 90 */}
-        <div style={{ display: 'flex', gap: 10, height: 90, marginTop: 4 }}>
+        <div style={{ display: 'flex', gap: 10, height: 90, marginTop: 16 }}>
           <MetricCard key={`c1-${activeCP}`} label={c1.label} value={c1.value} subtext={c1.subtext} />
           <MilestoneCard key={`c2-${activeCP}-${activeMilestone?.day ?? 'x'}`} text={c2Text} />
         </div>

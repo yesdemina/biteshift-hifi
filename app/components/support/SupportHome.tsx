@@ -1,5 +1,7 @@
+'use client'
 // Screen 4a — Support Home
 
+import { useState, useRef, useEffect } from 'react'
 import { reminderCards, supplies } from '@/lib/mockData'
 
 interface SupportHomeProps {
@@ -8,6 +10,18 @@ interface SupportHomeProps {
 }
 
 const CARD_BGS = ['#FFD9E5', '#EFE0FF', '#E0EEEE']
+
+// Toast copy keyed by data id.
+const REMINDER_TOASTS: Record<string, string> = {
+  tip:     'order placed · arriving in 3-5 days',
+  brush:   'opening shop · coming soon',
+  checkup: "we'll remind you closer to the date",
+}
+const SUPPLY_TOASTS: Record<string, string> = {
+  tips:     'scanner tips · coming soon',
+  brackets: 'brackets care kit · coming soon',
+  cleaning: 'cleaning brushes · coming soon',
+}
 
 function ChevronRight() {
   return (
@@ -20,6 +34,32 @@ function ChevronRight() {
 export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
   const trimmed = userName.trim()
   const greeting = trimmed ? `hi, ${trimmed}` : 'hi there'
+
+  // ── Toast — single instance, slides up from the bottom, holds 2s ───────────
+  const [toastMsg, setToastMsg] = useState<string | null>(null)
+  const [toastOn,  setToastOn]  = useState(false)
+  const hideRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const unmountRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => {
+    if (hideRef.current) clearTimeout(hideRef.current)
+    if (unmountRef.current) clearTimeout(unmountRef.current)
+  }, [])
+
+  const triggerToast = (msg: string) => {
+    if (hideRef.current) clearTimeout(hideRef.current)
+    if (unmountRef.current) clearTimeout(unmountRef.current)
+    // Mount hidden, then animate in on the next frame (replaces any current toast).
+    setToastMsg(msg)
+    setToastOn(false)
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => setToastOn(true))
+    )
+    hideRef.current = setTimeout(() => {
+      setToastOn(false)
+      unmountRef.current = setTimeout(() => setToastMsg(null), 220)
+    }, 2000)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
@@ -83,6 +123,8 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
               {card.text}
             </p>
             <button
+              className="press-dim"
+              onClick={() => triggerToast(REMINDER_TOASTS[card.id] ?? '')}
               style={{
                 background: '#000000',
                 border: 'none',
@@ -119,6 +161,8 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
           {supplies.map((item, i) => (
             <button
               key={item.id}
+              className="press-dim"
+              onClick={() => triggerToast(SUPPLY_TOASTS[item.id] ?? '')}
               style={{
                 width: '100%',
                 display: 'flex',
@@ -138,6 +182,36 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
           ))}
         </div>
       </div>
+
+      {/* Toast — black pill, anchored above the tab bar (bottom-center of frame) */}
+      {toastMsg && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 92,
+            left: '50%',
+            transform: toastOn
+              ? 'translateX(-50%) translateY(0)'
+              : 'translateX(-50%) translateY(8px)',
+            opacity: toastOn ? 1 : 0,
+            transition: 'opacity 200ms ease, transform 200ms ease',
+            maxWidth: 320,
+            padding: '12px 20px',
+            background: '#000000',
+            color: '#FFFFFF',
+            borderRadius: 999,
+            fontSize: 13,
+            fontWeight: 500,
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+            zIndex: 40,
+          }}
+        >
+          {toastMsg}
+        </div>
+      )}
     </div>
   )
 }
