@@ -1,6 +1,8 @@
 // TabBar — full-width neumorphic embossed bar flush with the PhoneFrame bottom.
 // The whole bar reads as raised; the active tab is debossed (recessed) into it.
 
+import TeethBarIcon from './TeethBarIcon'
+
 export type Tab = 'tracking' | 'hygiene' | 'camera' | 'support'
 
 interface TabBarProps {
@@ -17,17 +19,6 @@ function ClockIcon() {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 4a1 1 0 10-2 0v6a1 1 0 00.293.707l3.5 3.5a1 1 0 001.414-1.414L13 11.586V6z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-function ToothIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24">
-      <path
-        d="M9 3C6.5 3 5 5 5 7c0 1 .3 2 .6 3L7 18c.2 1 .7 2 2 2 .9 0 1.5-.6 2-.6.5 0 1.1.6 2 .6 1.3 0 1.8-1 2-2l1.4-8c.3-1 .6-2 .6-3 0-2-1.5-4-4-4-1.2 0-1.8.3-3 .3C10.8 3.3 10.2 3 9 3z"
         fill="currentColor"
       />
     </svg>
@@ -60,7 +51,7 @@ function PersonIcon() {
 
 const TABS: { id: Tab; Icon: React.ComponentType }[] = [
   { id: 'tracking', Icon: ClockIcon },
-  { id: 'hygiene',  Icon: ToothIcon },
+  { id: 'hygiene',  Icon: TeethBarIcon },
   { id: 'camera',   Icon: CameraIcon },
   { id: 'support',  Icon: PersonIcon },
 ]

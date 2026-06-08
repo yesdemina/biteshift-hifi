@@ -272,7 +272,7 @@ export default function TrackingHome() {
     return Math.max(0, Math.min(1, p))
   }
 
-  // Animate the handle to a target position over `dur` ms (chevron taps).
+  // Animate the handle to a target position over `dur` ms (label taps).
   const animateTo = (target: number, dur = 400) => {
     stopSwing()
     swingingRef.current = true
@@ -360,6 +360,10 @@ export default function TrackingHome() {
   const c2Text  = card2Text(activeCP, activeMilestone)
   // Day counter sits inside the capsule once the fill is wide enough to hold it.
   const dayInsideFill = liveDay >= 71
+  // At the extremes the counter is pinned to a capsule edge so it never floats
+  // alone or gets stranded mid-fill: day 0 hugs the left edge, day 283 the right.
+  const dayPinLeft  = liveDay <= 5
+  const dayPinRight = liveDay >= 278
 
   const resetToToday = () => {
     stopSwing()
@@ -475,78 +479,37 @@ export default function TrackingHome() {
               width: `${handlePosition * 100}%`,
               background: 'linear-gradient(90deg, #FFB3D1 0%, #E0C8FF 100%)',
               borderRadius: 999,
+              // Right-edge inset shadow doubles as the "drag me" hint now that
+              // the chevrons are gone.
               boxShadow:
-                'inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)',
+                'inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05), inset -4px 0 8px rgba(0,0,0,0.08)',
               pointerEvents: 'none',
             }}
           />
 
-          {/* Chevron tap targets */}
-          <button
-            aria-label="Jump to day 0"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => animateTo(0)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 12,
-              transform: 'translateY(-50%)',
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#999999" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            aria-label="Jump to forecast"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => animateTo(1)}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 12,
-              transform: 'translateY(-50%)',
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#999999" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-
           {/* Day counter — rides the fill's right edge. Sits just outside the
               fill on white while it's short (≤ day 70), then tucks inside the
               fill near its right edge once there's room (≥ day 71). Clamped so
-              it never collides with either chevron. */}
+              it never runs off either end of the capsule. */}
           <div
             aria-hidden
             style={{
               position: 'absolute',
               top: '50%',
-              left: dayInsideFill
-                ? `min(calc(${handlePosition * 100}% - 10px), calc(100% - 52px))`
-                : `max(calc(${handlePosition * 100}% + 10px), 52px)`,
-              transform: dayInsideFill
-                ? 'translate(-100%, -50%)'
-                : 'translate(0, -50%)',
-              transition: 'left 200ms ease, transform 200ms ease',
+              ...(dayPinLeft
+                ? { left: 16, transform: 'translateY(-50%)' }
+                : dayPinRight
+                ? { right: 16, transform: 'translateY(-50%)' }
+                : dayInsideFill
+                ? {
+                    left: `min(calc(${handlePosition * 100}% - 10px), calc(100% - 52px))`,
+                    transform: 'translate(-100%, -50%)',
+                  }
+                : {
+                    left: `max(calc(${handlePosition * 100}% + 10px), 52px)`,
+                    transform: 'translate(0, -50%)',
+                  }),
+              transition: 'left 200ms ease-out, right 200ms ease-out, transform 200ms ease-out',
               display: 'flex',
               alignItems: 'baseline',
               gap: 3,
@@ -574,6 +537,7 @@ export default function TrackingHome() {
         {/* Labels below the capsule */}
         <div style={{ position: 'relative', height: 16, marginTop: 6 }}>
           <span
+            onClick={() => animateTo(0)}
             style={{
               position: 'absolute',
               left: 0,
@@ -583,6 +547,7 @@ export default function TrackingHome() {
               color: activeCP === 'day0' ? '#000000' : '#999999',
               letterSpacing: '0.08em',
               whiteSpace: 'nowrap',
+              cursor: 'pointer',
             }}
           >
             DAY 0
@@ -591,9 +556,9 @@ export default function TrackingHome() {
             onClick={resetToToday}
             style={{
               position: 'absolute',
-              left: '66%',
+              left: '65%',
               top: 0,
-              transform: 'translateX(-50%)',
+              transform: 'translateX(-100%)',
               fontSize: 9,
               fontWeight: activeCP === 'today' ? 600 : 400,
               color: activeCP === 'today' ? '#000000' : '#999999',
@@ -605,6 +570,7 @@ export default function TrackingHome() {
             TODAY
           </span>
           <span
+            onClick={() => animateTo(1)}
             style={{
               position: 'absolute',
               right: 0,
@@ -614,6 +580,7 @@ export default function TrackingHome() {
               color: activeCP === 'forecast' ? '#000000' : '#999999',
               letterSpacing: '0.08em',
               whiteSpace: 'nowrap',
+              cursor: 'pointer',
             }}
           >
             FORECAST
