@@ -241,3 +241,50 @@ body {
 .cp-fade {
   animation: cpFade 200ms ease-out;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE full-screen reflow (≤600px) — the app was built for a fixed 390×844
+   frame; on a real phone it must reflow to the live viewport. These rules use
+   !important to override the components' inline styles on MOBILE ONLY; desktop
+   (>600px, the showcase) is untouched. (Paired with PhoneFrame's own media query
+   which drops the panel/bezel and fills the screen.)
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* App root = full-viewport flex column (StatusBar → scroll → fixed tab bar). */
+  .bs-app-root {
+    height: 100dvh !important;
+  }
+
+  /* Scrollable middle. Reserve room so content never hides under the FIXED tab
+     bar (bar height 64 + 16 gap + 16 breathing room + the home-indicator inset). */
+  .bs-app-scroll {
+    min-height: 0 !important;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Tab bar pinned to the very bottom of the viewport, lifted above the iPhone
+     home indicator. position:fixed is safe here because the mobile panel has no
+     transform (so fixed resolves to the viewport, not the panel). */
+  .bs-tabbar {
+    position: fixed !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Hero shrinks to a sensible slice of the viewport instead of forcing the
+     column taller than the screen, so the capsule + DAY0/TODAY/FORECAST labels
+     + both cards + INSIGHT all fit below it (small scroll at most on short
+     phones). The absolute face frames fill the (smaller) hero and object-fit
+     cover keeps the face centered. */
+  .bs-hero {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 44dvh !important;
+  }
+  .bs-hero img {
+    top: 0 !important;
+    height: 100% !important;
+  }
+}

@@ -84,8 +84,8 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
             transform: none;
             border-radius: 0;
             box-shadow: none;
-            /* Keep the floating tab bar clear of the iPhone home indicator. */
-            padding-bottom: env(safe-area-inset-bottom);
+            /* Safe-area is handled by the fixed tab bar + the scroll padding
+               (see globals.css), so the panel itself fills the full height. */
           }
           .bs-frame-link {
             display: none;

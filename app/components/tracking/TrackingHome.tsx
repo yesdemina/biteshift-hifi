@@ -488,7 +488,7 @@ export default function TrackingHome() {
           frame. Container = 450px face area + 44px status-bar band = 494px.
           The face image is pushed down 44px so it stays in the exact same spot
           as before; the halo fills the whole container, including the top band. ── */}
-      <div style={{ position: 'relative', width: '100%', height: 494, flexShrink: 0, overflow: 'hidden' }}>
+      <div className="bs-hero" style={{ position: 'relative', width: '100%', height: 494, flexShrink: 0, overflow: 'hidden' }}>
         {/* Pink halo glow (scaled up, behind the image) — fills to the top edge */}
         <div
           style={{

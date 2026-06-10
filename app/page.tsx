@@ -241,7 +241,7 @@ export default function Home() {
 
       {/* ── Main app ── */}
       {appScreen === 'main' && (
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div className="bs-app-root" style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Tracking hero bleeds its pink halo up behind the status bar, so the
               bar is overlaid (transparent) and the scroller fills from the top.
               Every other screen keeps the normal opaque white status bar. */}
@@ -253,8 +253,13 @@ export default function Home() {
             <StatusBar />
           )}
           {/* paddingBottom reserves the floating tab bar's footprint so screen
-              content keeps the same usable height and never hides behind it */}
-          <div style={{ flex: 1, overflowY: 'auto', paddingBottom: showTabBar ? 72 : 0 }}>
+              content keeps the same usable height and never hides behind it.
+              On mobile, bs-app-scroll bumps that padding to clear the FIXED bar
+              (only when the bar is shown). */}
+          <div
+            className={showTabBar ? 'bs-app-scroll' : undefined}
+            style={{ flex: 1, overflowY: 'auto', paddingBottom: showTabBar ? 72 : 0 }}
+          >
             {renderContent()}
           </div>
           {showTabBar && (

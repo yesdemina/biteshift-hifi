@@ -59,6 +59,7 @@ const TABS: { id: Tab; Icon: React.ComponentType }[] = [
 export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
   return (
     <div
+      className="bs-tabbar"
       style={{
         position: 'absolute',
         bottom: 16,
