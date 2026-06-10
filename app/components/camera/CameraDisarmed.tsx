@@ -1,8 +1,11 @@
 // Screen 3a — Camera (single state)
 // The bracket camera is always listening. The app is instructions + summary + review.
 
+import { drafts } from '@/lib/mockData'
+
 interface CameraScreenProps {
   onViewDrafts: () => void
+  onOpenDraft: (id: number) => void
 }
 
 // ── Helper rows ────────────────────────────────────────────────────────────────
@@ -19,76 +22,39 @@ function StatRow({ value, label, tail }: { value: string; label: string; tail?: 
   )
 }
 
-function MechanicRow({ icon, text }: { icon: React.ReactNode; text: string }) {
+// ── Play indicator — circular badge with a white triangle (matches Drafts 3c) ──
+
+function PlayIndicator({ size }: { size: number }) {
+  const tri = Math.round(size * 0.42)
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-      <div
-        style={{
-          width: 24,
-          height: 24,
-          background: '#F5F5F5',
-          borderRadius: 8,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        {icon}
-      </div>
-      <span style={{ fontSize: 13, color: '#333333' }}>{text}</span>
+    <div
+      style={{
+        width:          size,
+        height:         size,
+        borderRadius:   '50%',
+        background:     'rgba(0, 0, 0, 0.6)',
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg width={tri} height={tri} viewBox="0 0 10 10" style={{ marginLeft: tri * 0.12 }}>
+        <path d="M2 1.3L8.5 5L2 8.7Z" fill="#FFFFFF" />
+      </svg>
     </div>
-  )
-}
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
-
-function PhotoIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6" stroke="#666" strokeWidth="1.2" />
-      <circle cx="5" cy="8" r="1.1" fill="#666" />
-      <circle cx="8" cy="8" r="1.1" fill="#666" />
-      <circle cx="11" cy="8" r="1.1" fill="#666" />
-    </svg>
-  )
-}
-
-function VideoIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <rect x="2" y="5" width="12" height="7" rx="2" stroke="#666" strokeWidth="1.2" />
-      <circle cx="8" cy="8.5" r="2" fill="#666" />
-    </svg>
-  )
-}
-
-function SparklesIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <path d="M8 2.5l1.2 2.8 2.8 1.2-2.8 1.2L8 10.5 6.8 7.7 4 6.5l2.8-1.2z" stroke="#666" strokeWidth="1.1" strokeLinejoin="round" />
-      <circle cx="12.5" cy="11.5" r="0.8" fill="#666" />
-      <circle cx="3.5" cy="11.5" r="0.6" fill="#666" />
-    </svg>
-  )
-}
-
-function ClockIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6" stroke="#666" strokeWidth="1.2" />
-      <path d="M8 4.5V8l2.2 1.5" stroke="#666" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
   )
 }
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export default function CameraScreen({ onViewDrafts }: CameraScreenProps) {
+export default function CameraScreen({ onViewDrafts, onOpenDraft }: CameraScreenProps) {
+  // Latest 3 captures (drafts array is ordered most-recent first).
+  const recent = drafts.slice(0, 3)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
       {/* Headline */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px', textAlign: 'center' }}>
         hands-free camera
       </h1>
 
@@ -96,7 +62,7 @@ export default function CameraScreen({ onViewDrafts }: CameraScreenProps) {
       <div style={{ margin: '14px 24px 0' }}>
         <div
           style={{
-            background: 'linear-gradient(135deg, #FFD9E5 0%, #FFB3D1 100%)',
+            background: 'linear-gradient(135deg, #EFE0FF 0%, #E0EEEE 100%)',
             borderRadius: 20,
             padding: 20,
           }}
@@ -106,7 +72,7 @@ export default function CameraScreen({ onViewDrafts }: CameraScreenProps) {
               className="listening-pulse"
               style={{ width: 8, height: 8, borderRadius: '50%', background: '#000000', display: 'block' }}
             />
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#000000' }}>camera is listening</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#000000' }}>camera is ready</span>
           </div>
           <p style={{ marginTop: 12, fontSize: 12, color: '#333333' }}>
             triple-click your teeth to capture
@@ -129,7 +95,46 @@ export default function CameraScreen({ onViewDrafts }: CameraScreenProps) {
         </div>
       </div>
 
-      {/* Primary CTA */}
+      {/* RECENT — latest capture thumbnails */}
+      <div style={{ padding: '24px 24px 0' }}>
+        <div style={{ fontSize: 9, fontWeight: 600, color: '#666666', letterSpacing: '0.08em', marginBottom: 12 }}>
+          RECENT
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {recent.map((draft) => (
+            <div
+              key={draft.id}
+              className="draft-item"
+              onClick={() => onOpenDraft(draft.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && onOpenDraft(draft.id)}
+              style={{
+                position:     'relative',
+                flex:         1,
+                aspectRatio:  '1 / 1',
+                borderRadius: 12,
+                overflow:     'hidden',
+                background:   '#F5F5F5',
+                cursor:       'pointer',
+              }}
+            >
+              <img
+                src={draft.src}
+                alt={draft.label}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+              {draft.type === 'video' && (
+                <div style={{ position: 'absolute', top: 6, left: 6 }}>
+                  <PlayIndicator size={22} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Primary CTA — bottom of content */}
       <div style={{ padding: '24px 24px 0' }}>
         <button
           onClick={onViewDrafts}
@@ -147,17 +152,6 @@ export default function CameraScreen({ onViewDrafts }: CameraScreenProps) {
         >
           view drafts
         </button>
-      </div>
-
-      {/* HOW IT WORKS */}
-      <div style={{ padding: '32px 24px 0' }}>
-        <div style={{ fontSize: 9, fontWeight: 600, color: '#666666', letterSpacing: '0.08em', marginBottom: 12 }}>
-          HOW IT WORKS
-        </div>
-        <MechanicRow icon={<PhotoIcon />}     text="triple-click teeth → photo" />
-        <MechanicRow icon={<VideoIcon />}     text="bite & hold 2s → video" />
-        <MechanicRow icon={<SparklesIcon />}  text="bad shots auto-removed" />
-        <MechanicRow icon={<ClockIcon />}     text="drafts expire in 24h" />
       </div>
     </div>
   )

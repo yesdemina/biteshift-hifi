@@ -239,10 +239,11 @@ interface DraftsProps {
   onBack:      () => void   // back to Armed screen
   draftsCount: number
   onClearAll:  () => void
+  initialDraft?: number | null  // open straight into Review (3d) for this draft
 }
 
-export default function Drafts({ onBack, draftsCount, onClearAll }: DraftsProps) {
-  const [selectedDraft, setSelectedDraft] = useState<number | null>(null)
+export default function Drafts({ onBack, draftsCount, onClearAll, initialDraft = null }: DraftsProps) {
+  const [selectedDraft, setSelectedDraft] = useState<number | null>(initialDraft)
 
   // Show detail when a draft is tapped
   if (selectedDraft !== null) {

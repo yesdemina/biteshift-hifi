@@ -98,7 +98,7 @@ export default function HistoricalScanDetail({ scan, onBack }: HistoricalScanDet
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', lineHeight: 1.2, letterSpacing: '-0.4px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', lineHeight: 1.2, letterSpacing: '-0.4px', textAlign: 'center' }}>
         scan from {scan.date.toLowerCase()}
       </h1>
 

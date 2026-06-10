@@ -3,7 +3,29 @@
     "allow": [
       "Bash(npm run *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(npx tsc *)",
+      "Bash(taskkill /PID 26572 /F)",
+      "PowerShell(Stop-Process -Id 26572 -Force)",
+      "PowerShell(\"done\")",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\galin\\\\Desktop\\\\biteshift-hifi\\\\public\\\\teeth.png\"\\); \"teeth.png: $\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\))",
+      "Bash(taskkill /PID 13196 /F)",
+      "PowerShell(Stop-Process -Id 13196 -Force)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"name='node.exe'\" | Select-Object ProcessId, @{n='Cmd';e={$_.CommandLine.Substring\\(0,[Math]::Min\\(80,$_.CommandLine.Length\\)\\)}} | Format-Table -AutoSize)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:61506)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'C:\\\\Users\\\\galin\\\\Desktop\\\\biteshift-hifi\\\\.next\\\\dev\\\\logs\\\\next-development.log' -Tail 5 | Select-String -Pattern 'Compiled|ERROR|error'\")",
+      "Bash(curl -s -o NUL -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'C:\\\\Users\\\\galin\\\\Desktop\\\\biteshift-hifi\\\\.next\\\\dev\\\\logs\\\\next-development.log' -Tail 4 | Select-String -Pattern 'Compiled|ERROR'\")",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'C:\\\\Users\\\\galin\\\\Desktop\\\\biteshift-hifi\\\\.next\\\\dev\\\\logs\\\\next-development.log' -Tail 3 | Select-String -Pattern 'Compiled|ERROR'\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const b=fs.readFileSync\\('public/teeth.png'\\);const w=b.readUInt32BE\\(16\\),h=b.readUInt32BE\\(20\\);console.log\\('intrinsic',w,'x',h,'-> at width 290, rendered height =',Math.round\\(290*h/w\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP:%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(git commit -m 'scan animation, scan result chips/rings, tooth detail zoom+color, centered headlines, gray showcase bg *)"
     ]
   }
 }

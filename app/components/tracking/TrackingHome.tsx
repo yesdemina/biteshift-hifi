@@ -63,10 +63,50 @@ function interpolateDay(p: number): number {
   return Math.round(142 + ((p - 0.66) * (283 - 142)) / (1.0 - 0.66))
 }
 
+// Same piecewise mapping as interpolateDay but WITHOUT rounding — the hero blend
+// must be driven by the continuous handle position so the cross-fade never
+// snaps at integer-day boundaries (which caused milestone-crossing flicker).
+function dayFromPosition(p: number): number {
+  if (p <= 0.66) return (p * 142) / 0.66
+  return 142 + ((p - 0.66) * (283 - 142)) / (1.0 - 0.66)
+}
+
 function nearestMilestone(arr: Milestone[], day: number): Milestone {
   return arr.reduce((best, m) =>
     Math.abs(m.day - day) < Math.abs(best.day - day) ? m : best
   )
+}
+
+// ── Hero progression frames ─────────────────────────────────────────────────
+// 11 photos of the same framing, captured at these treatment days. The hero
+// continuously cross-fades between the two frames the handle sits between, so
+// the face morphs smoothly as you drag rather than snapping to the nearest day.
+const heroFrames: { day: number; src: string }[] = [
+  { day: 0,   src: '/day-000.png' },
+  { day: 30,  src: '/day-030.png' },
+  { day: 60,  src: '/day-060.png' },
+  { day: 90,  src: '/day-090.png' },
+  { day: 120, src: '/day-120.png' },
+  { day: 142, src: '/day-142.png' },
+  { day: 180, src: '/day-180.png' },
+  { day: 220, src: '/day-220.png' },
+  { day: 250, src: '/day-250.png' },
+  { day: 270, src: '/day-270.png' },
+  { day: 283, src: '/day-283.png' },
+]
+
+// Given a continuous day position, return the bracketing frame indices and the
+// 0..1 blend factor between them (t=0 → fully frame A, t=1 → fully frame B).
+function frameBlend(day: number): { a: number; b: number; t: number } {
+  if (day <= heroFrames[0].day) return { a: 0, b: 0, t: 0 }
+  const last = heroFrames.length - 1
+  if (day >= heroFrames[last].day) return { a: last, b: last, t: 0 }
+  let a = 0
+  while (a < last && heroFrames[a + 1].day <= day) a++
+  const b = Math.min(a + 1, last)
+  const span = heroFrames[b].day - heroFrames[a].day
+  const t = span > 0 ? (day - heroFrames[a].day) / span : 0
+  return { a, b, t }
 }
 
 /** -2.8 mm at day 1 → 0.0 mm at day 142 */
@@ -356,6 +396,9 @@ export default function TrackingHome() {
   }, [])
 
   const liveDay = interpolateDay(handlePosition)
+  // Hero continuously blends between the two frames the handle sits between —
+  // driven by the CONTINUOUS position (not rounded liveDay) so it never snaps.
+  const blend = frameBlend(dayFromPosition(handlePosition))
   const c1      = card1Data(activeCP, liveDay)
   const c2Text  = card2Text(activeCP, activeMilestone)
   // Day counter sits inside the capsule once the fill is wide enough to hold it.
@@ -398,25 +441,51 @@ export default function TrackingHome() {
             pointerEvents: 'none',
           }}
         />
-        <img
-          src="/user.png"
-          alt="Your smile"
-          style={{
-            position: 'absolute',
-            top: 44,
-            left: 0,
-            right: 0,
-            height: 450,
-            width: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center 50%',
-            display: 'block',
-            // Dissolve the photo's top edge into the pink halo — no hard seam
-            // under the status bar.
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
-            maskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
-          }}
-        />
+        {/* Progression frames — all 11 are PERMANENTLY mounted with a fixed src
+            and a stable key, so React never remounts them and the browser never
+            re-fetches/re-decodes a layer mid-drag (that was the flash). eager +
+            sync decode forces every frame ready before the first drag.
+
+            Blend without a background bleed: the lower frame (A) stays FULLY
+            OPAQUE as the base and the higher frame (B) fades in ON TOP by `t`.
+            Higher-day frames come later in this map, so they already stack above
+            lower ones — there is always exactly one opaque image, so the white
+            container / pink halo can never show through mid-transition. Every
+            layer shares one identical style object, so they are pixel-aligned.
+            No CSS opacity transition — smoothness comes from the handle itself. */}
+        {heroFrames.map((f, i) => (
+          <img
+            key={f.src}
+            src={f.src}
+            alt="Your smile"
+            loading="eager"
+            decoding="sync"
+            draggable={false}
+            style={{
+              position: 'absolute',
+              top: 44,
+              left: 0,
+              width: '100%',
+              height: 450,
+              objectFit: 'cover',
+              objectPosition: 'center 50%',
+              display: 'block',
+              // Base (lower) frame is ALWAYS fully opaque so the background can
+              // never bleed through; only the distinct upper frame fades on top.
+              opacity:
+                i === blend.a
+                  ? 1
+                  : i === blend.b && blend.b !== blend.a
+                    ? blend.t
+                    : 0,
+              pointerEvents: 'none',
+              // Dissolve the photo's top edge into the pink halo — no hard seam
+              // under the status bar.
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
+              maskImage: 'linear-gradient(to bottom, transparent 0, #000 52px)',
+            }}
+          />
+        ))}
       </div>
 
       {/* ── Capsule slider area ── */}

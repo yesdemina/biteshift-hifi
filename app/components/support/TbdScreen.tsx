@@ -33,7 +33,7 @@ export default function TbdScreen({ title, onBack }: TbdScreenProps) {
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '14px 24px 0', letterSpacing: '-0.4px', textAlign: 'center' }}>
         {title.toLowerCase()}
       </h1>
 

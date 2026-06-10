@@ -1,5 +1,7 @@
-// PhoneFrame — 390×844 px iPhone-shaped container, centered on #FAFAFA page.
-// position:relative so absolute-positioned overlays (modals) anchor to it.
+// PhoneFrame — 390×844 px app screen as a clean rounded-corner panel (no device
+// bezel), centered on a neutral gray page with a soft drop shadow so it lifts off
+// the background. The screen div is position:relative so absolute overlays
+// (modals) anchor to it.
 
 export default function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -9,20 +11,20 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#FAFAFA',
-        padding: '16px 0',
+        background: '#DEDEDE',
+        padding: '24px 0',
       }}
     >
+      {/* App screen — rounded panel sitting directly on the gray, soft shadow. */}
       <div
         style={{
           position: 'relative',
           width: 390,
           height: 844,
           background: '#FFFFFF',
-          border: '1px solid #E0E0E0',
-          borderRadius: 48,
+          borderRadius: 44,
           overflow: 'hidden',
-          boxShadow: '0 0 0 1px #D0D0D0, 0 24px 64px rgba(0,0,0,0.10)',
+          boxShadow: '0 30px 70px rgba(0,0,0,0.15)',
           fontFamily:
             "'RF Dewi Extended', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
         }}

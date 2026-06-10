@@ -201,18 +201,18 @@ body {
   animation: scannerPulse 2.4s ease-in-out infinite;
 }
 
-/* Hygiene Result: pulsing problem-tooth glow */
-@keyframes problemGlowPulse {
-  0%, 100% { opacity: 0.6; }
+/* Hygiene Result: focus-reticle target ring over each problem zone */
+@keyframes problemRingPulse {
+  0%, 100% { opacity: 0.82; }
   50%      { opacity: 1; }
 }
-.problem-glow {
-  animation: problemGlowPulse 2.4s ease-in-out infinite;
-  transition: transform 0.2s ease;
+.problem-ring {
+  animation: problemRingPulse 2.4s ease-in-out infinite;
+  transition: filter 0.2s ease;
   cursor: pointer;
 }
-.problem-glow:hover {
-  transform: scale(1.05);
+.problem-ring:hover {
+  filter: brightness(1.1);
 }
 
 /* Camera: listening-state pulsing dot */

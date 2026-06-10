@@ -31,6 +31,51 @@ export const toothData = {
   fix: 'Use interdental brush, 2x daily for 1 week',
 }
 
+// Tab 2 — Tooth Detail zones (2c → 2d data flow). Each tapped problem zone on the
+// Scan Result carries its own tooth identity + a focus point (background-position
+// %, in teeth.png image space) so 2d zooms to the exact tooth the user tapped.
+export type ZoneType = 'plaque' | 'gum'
+
+export interface ToothZone {
+  type:     ZoneType
+  pill:     string
+  headline: string
+  issue:    string
+  why:      string
+  fix:      string
+  zoom:     number                    // background-size %
+  focus:    { x: number; y: number }  // background-position %
+}
+
+// Per-type content. The focus is supplied per-marker on 2c (the tapped ring's
+// own position in image space), so it follows the actual tooth tapped.
+export const toothZoneContent: Record<ZoneType, Omit<ToothZone, 'focus'>> = {
+  plaque: {
+    type:     'plaque',
+    pill:     'Lower right canine #27',
+    headline: 'Plaque buildup',
+    issue:    'Light plaque on inner surface',
+    why:      'Hard to reach due to bracket position',
+    fix:      'Use interdental brush, 2x daily for 1 week',
+    zoom:     230,
+  },
+  gum: {
+    type:     'gum',
+    pill:     'Upper right molar #3',
+    headline: 'Gum inflammation',
+    issue:    'Inflamed, tender gum line',
+    why:      'Plaque irritation along the gumline',
+    fix:      'Warm salt-water rinse + gentle massage, 2x daily',
+    zoom:     230,
+  },
+}
+
+// Fallback when 2d is reached without a selection — preserves the original crop.
+export const defaultToothZone: ToothZone = {
+  ...toothZoneContent.plaque,
+  focus: { x: 73, y: 61 },
+}
+
 // Tab 2 — Scan History (Screen 2e / 2f)
 export type DotType = 'filled' | 'half' | 'outline'
 

@@ -125,7 +125,7 @@ export default function ProfileScreen({
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', letterSpacing: '-0.4px' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', letterSpacing: '-0.4px', textAlign: 'center' }}>
         profile
       </h1>
 

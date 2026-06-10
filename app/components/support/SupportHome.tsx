@@ -63,16 +63,32 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', paddingBottom: 24, background: '#FFFFFF' }}>
-      {/* Headline + avatar */}
+      {/* Headline + avatar — headline absolutely centered across the screen while
+          the avatar stays pinned to the right (so the title reads centered like
+          every other screen without shifting the avatar). */}
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           padding: '14px 24px 0',
         }}
       >
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', letterSpacing: '-0.4px', margin: 0 }}>
+        <h1
+          style={{
+            position: 'absolute',
+            left: 24,
+            right: 24,
+            top: 14,
+            textAlign: 'center',
+            fontSize: 22,
+            fontWeight: 700,
+            color: '#000000',
+            letterSpacing: '-0.4px',
+            margin: 0,
+          }}
+        >
           {greeting}
         </h1>
         <button

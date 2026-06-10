@@ -5,18 +5,17 @@
  * App-level state:
  *   appScreen          — controls pre-auth flow vs main app
  *   userName           — set during onboarding; used in Welcome + Support greeting
- *   hasSeenCalibration — ensures 3-s auto-modal fires only once per session
  *   cameraArmed        — persists across tab switches
- *   showCalibration    — whether the calibration bottom-sheet is visible
- *   showFaceScan       — whether the face-scan progress overlay is visible
+ *   showFaceScan       — face-scan progress overlay (now unlinked: its only
+ *                        trigger, the calibration modal, was removed)
  *
  * Screen flow:
  *   Splash (0) → Onboarding (0b) → Welcome (0c) → Main app
  *                                 ↗ (if userName set already)
  */
 
-import { useState, useEffect } from 'react'
-import type { ScanHistoryEntry } from '@/lib/mockData'
+import { useState } from 'react'
+import { defaultToothZone, type ScanHistoryEntry, type ToothZone } from '@/lib/mockData'
 
 // ── Shared ─────────────────────────────────────────────────────────────────────
 import PhoneFrame        from '@/app/components/shared/PhoneFrame'
@@ -30,7 +29,6 @@ import WelcomeScreen     from '@/app/components/onboarding/WelcomeScreen'
 
 // ── Tracking (tab 1) ───────────────────────────────────────────────────────────
 import TrackingHome      from '@/app/components/tracking/TrackingHome'
-import CalibrationModal  from '@/app/components/tracking/CalibrationModal'
 import FaceScanProgress  from '@/app/components/tracking/FaceScanProgress'
 
 // ── Hygiene (tab 2) ────────────────────────────────────────────────────────────
@@ -70,36 +68,23 @@ export default function Home() {
   const [hygieneSub, setHygieneSub] = useState<HygieneSub>('home')
   const [cameraSub,  setCameraSub]  = useState<CameraSub>('home')
 
-  // ── Overlay / modal state ──────────────────────────────────────────────────
-  const [showCalibration,    setShowCalibration]    = useState(false)
-  const [hasSeenCalibration, setHasSeenCalibration] = useState(false)
-  const [showFaceScan,       setShowFaceScan]       = useState(false)
+  // ── Overlay state ──────────────────────────────────────────────────────────
+  const [showFaceScan, setShowFaceScan] = useState(false)
 
   // ── Drafts ─────────────────────────────────────────────────────────────────
   const [draftsCount, setDraftsCount] = useState(6)
+  // Draft to open directly in Review (3d) when entering Drafts (null = grid view)
+  const [initialDraft, setInitialDraft] = useState<number | null>(null)
 
   // ── Scan history ────────────────────────────────────────────────────────────
   const [selectedScan, setSelectedScan] = useState<ScanHistoryEntry | null>(null)
 
+  // ── Selected problem zone (2c → 2d): drives Tooth Detail's zoom + copy ───────
+  const [selectedZone, setSelectedZone] = useState<ToothZone | null>(null)
+
   // ── Support sub-navigation ───────────────────────────────────────────────────
   const [supportSub, setSupportSub] = useState<SupportSub>('home')
   const [tbdTitle,   setTbdTitle]   = useState('')
-
-  // ── Calibration modal: fires once, 3 s after entering main Tracking tab ───
-  useEffect(() => {
-    if (
-      appScreen === 'main' &&
-      activeTab === 'tracking' &&
-      !hasSeenCalibration &&
-      !showFaceScan
-    ) {
-      const id = setTimeout(() => {
-        setShowCalibration(true)
-        setHasSeenCalibration(true)
-      }, 3000)
-      return () => clearTimeout(id)
-    }
-  }, [appScreen, activeTab, hasSeenCalibration, showFaceScan])
 
   // ── Pre-auth handlers ──────────────────────────────────────────────────────
 
@@ -126,27 +111,22 @@ export default function Home() {
   // ── Sign out — resets all session state → Splash ───────────────────────────
   const handleSignOut = () => {
     setUserName('')
-    setHasSeenCalibration(false)
     setCameraSub('home')
     setActiveTab('tracking')
     setHygieneSub('home')
     setSupportSub('home')
-    setShowCalibration(false)
     setShowFaceScan(false)
     setSelectedScan(null)
+    setSelectedZone(null)
     setDraftsCount(6)
     setAppScreen('splash')
   }
 
-  // ── Face scan handlers ─────────────────────────────────────────────────────
-  const handleScanMyFace = () => {
-    setShowCalibration(false)
-    setShowFaceScan(true)
-  }
-
+  // ── Face scan handler ──────────────────────────────────────────────────────
+  // Face Scan (1c) is currently unlinked: its only entry point was the calibration
+  // modal, which has been removed. The FaceScanProgress screen is kept intact below.
   const handleFaceScanComplete = () => {
     setShowFaceScan(false)
-    // Land on clean Tracking Home — no modal
   }
 
   // ── Tab bar: hidden during active scan, face scan overlay, change password ──
@@ -179,10 +159,12 @@ export default function Home() {
       if (hygieneSub === 'result')   return (
         <ScanResult
           onBack={() => setHygieneSub('home')}
-          onToothDetail={() => setHygieneSub('detail')}
+          onToothDetail={(zone) => { setSelectedZone(zone); setHygieneSub('detail') }}
         />
       )
-      if (hygieneSub === 'detail')   return <ToothDetail onBack={() => setHygieneSub('result')} />
+      if (hygieneSub === 'detail')   return (
+        <ToothDetail zone={selectedZone ?? defaultToothZone} onBack={() => setHygieneSub('result')} />
+      )
       if (hygieneSub === 'history')  return (
         <ScanHistory
           onBack={() => setHygieneSub('home')}
@@ -200,13 +182,17 @@ export default function Home() {
     // Tab 3 — Camera
     if (activeTab === 'camera') {
       if (cameraSub === 'home')   return (
-        <CameraScreen onViewDrafts={() => setCameraSub('drafts')} />
+        <CameraScreen
+          onViewDrafts={() => { setInitialDraft(null); setCameraSub('drafts') }}
+          onOpenDraft={(id) => { setInitialDraft(id); setCameraSub('drafts') }}
+        />
       )
       if (cameraSub === 'drafts') return (
         <Drafts
           onBack={() => setCameraSub('home')}
           draftsCount={draftsCount}
           onClearAll={() => setDraftsCount(0)}
+          initialDraft={initialDraft}
         />
       )
     }
@@ -283,17 +269,8 @@ export default function Home() {
            NOT position:fixed — stays bounded to the 390×844 frame.
       */}
 
-      {/* Calibration bottom sheet (1b) */}
-      {appScreen === 'main' &&
-        showCalibration &&
-        activeTab === 'tracking' && (
-          <CalibrationModal
-            onLater={() => setShowCalibration(false)}
-            onScan={handleScanMyFace}
-          />
-        )}
-
-      {/* Face scan progress (4-second bar) — covers status bar + tab bar */}
+      {/* Face scan progress (4-second bar) — covers status bar + tab bar.
+          Currently unreachable: its trigger (the calibration modal) was removed. */}
       {showFaceScan && (
         <FaceScanProgress onComplete={handleFaceScanComplete} />
       )}
