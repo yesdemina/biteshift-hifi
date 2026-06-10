@@ -155,7 +155,7 @@ function DraftDetail({
           fontSize: 12,
           color: '#999999',
           padding: '10px 24px 0',
-          lineHeight: 1.55,
+          lineHeight: 1.3,
           textAlign: 'center',
         }}
       >
@@ -223,7 +223,7 @@ function EmptyState() {
           fontSize:   13,
           color:      '#999999',
           textAlign:  'center',
-          lineHeight: 1.5,
+          lineHeight: 1.3,
           margin:     0,
         }}
       >

@@ -17,7 +17,11 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#DEDEDE',
+        // Soft warm-neutral pearl — near-white base with a whisper of lavender
+        // (top) easing to a faint mint (bottom). Kept extremely light so it
+        // reads as elegant pearl, not a colored wash.
+        background:
+          'radial-gradient(135% 110% at 50% 0%, #F5EEF7 0%, #F2F0F4 50%, #ECF1F1 100%)',
         padding: '24px 0',
       }}
     >
@@ -35,7 +39,7 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
             background: '#FFFFFF',
             borderRadius: 44,
             overflow: 'hidden',
-            boxShadow: '0 30px 70px rgba(0,0,0,0.15)',
+            boxShadow: '0 30px 70px rgba(0,0,0,0.18)',
             fontFamily:
               "'RF Dewi Extended', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
           }}

@@ -403,20 +403,23 @@ export default function StyleGuide() {
               rf dewi extended · weights 400 / 600 / 700 · all lowercase
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-              <TypeRow meta="headline · 22px · 700">
-                <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.4px' }}>headline</span>
+              <TypeRow meta="headline · 22px · 700 · lh 1.15">
+                <span style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.4px' }}>headline</span>
               </TypeRow>
-              <TypeRow meta="number · 24px · 700">
-                <span style={{ fontSize: 24, fontWeight: 700 }}>number</span>
+              <TypeRow meta="number · 24px · 700 · lh 1.1">
+                <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>number</span>
               </TypeRow>
-              <TypeRow meta="body · 13px · 400">
-                <span style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.5 }}>body</span>
+              <TypeRow meta="body · 13px · 400 · lh 1.3">
+                <span style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.3 }}>body</span>
               </TypeRow>
-              <TypeRow meta="button · 13px · 600">
-                <span style={{ fontSize: 13, fontWeight: 600 }}>button</span>
+              <TypeRow meta="caption · 11px · 400 · lh 1.3">
+                <span style={{ fontSize: 11, fontWeight: 400, lineHeight: 1.3, color: '#666666' }}>caption</span>
               </TypeRow>
-              <TypeRow meta="small label · 9px · 600 · uppercase">
-                <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#666666' }}>
+              <TypeRow meta="button · 13px · 600 · lh 1">
+                <span style={{ fontSize: 13, fontWeight: 600, lineHeight: 1 }}>button</span>
+              </TypeRow>
+              <TypeRow meta="small label · 9px · 600 · uppercase · lh 1.2">
+                <span style={{ fontSize: 9, fontWeight: 600, lineHeight: 1.2, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#666666' }}>
                   small label
                 </span>
               </TypeRow>

@@ -137,7 +137,7 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
               gap: 12,
             }}
           >
-            <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.45, flex: 1 }}>
+            <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.28, flex: 1 }}>
               {card.text}
             </p>
             <button

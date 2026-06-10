@@ -47,7 +47,7 @@ export default function TbdScreen({ title, onBack }: TbdScreenProps) {
           textAlign:    'center',
         }}
       >
-        <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.5, margin: 0 }}>
+        <p style={{ fontSize: 13, color: '#000000', lineHeight: 1.3, margin: 0 }}>
           {title.toLowerCase()} settings coming soon.
         </p>
       </div>

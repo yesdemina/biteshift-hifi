@@ -99,7 +99,7 @@ export default function ChangePasswordScreen({ onBack }: ChangePasswordScreenPro
       </h1>
 
       {/* Subtitle */}
-      <p style={{ fontSize: 13, color: '#999999', padding: '6px 24px 0', lineHeight: 1.45, marginBottom: 0 }}>
+      <p style={{ fontSize: 13, color: '#999999', padding: '6px 24px 0', lineHeight: 1.3, marginBottom: 0 }}>
         create a new password for your account
       </p>
 

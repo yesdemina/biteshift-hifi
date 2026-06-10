@@ -264,6 +264,10 @@ export default function TrackingHome() {
   const [activeCP, setActiveCP]                 = useState<CP>('today')
   const [activeMilestone, setActiveMilestone]   = useState<Milestone | null>(null)
   const [dragging, setDragging]                 = useState(false)
+  // True only while the one-time swing HINT is animating. During it the hero
+  // freezes on day 142 (the handle/fill still swing); normal drag blending
+  // resumes the moment it ends or the user grabs the handle.
+  const [hintSwinging, setHintSwinging]         = useState(false)
 
   const isDragging         = useRef(false)
   const debounceRef        = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -283,6 +287,7 @@ export default function TrackingHome() {
     swingRafRef.current = null
     swingTimeoutRef.current = null
     swingingRef.current = false
+    setHintSwinging(false)
   }
 
   const scheduleUpdate = () => {
@@ -355,17 +360,21 @@ export default function TrackingHome() {
       })
 
     swingTimeoutRef.current = setTimeout(async () => {
-      await tween(0.66, 0.75, 400, easeOut)
+      // Freeze the hero on day 142 for the duration of the hint — only the
+      // handle/fill should swing, not the face. Eased glides, gentle amplitude.
+      setHintSwinging(true)
+      await tween(0.66, 0.72, 600, easeInOut)
       if (!swingingRef.current) return
-      await tween(0.75, 0.55, 600, easeInOut)
+      await tween(0.72, 0.60, 900, easeInOut)
       if (!swingingRef.current) return
-      await tween(0.55, 0.66, 400, easeIn)
+      await tween(0.60, 0.66, 600, easeInOut)
       if (!swingingRef.current) return
       handlePositionRef.current = 0.66
       setHandlePosition(0.66)
       setActiveCP('today')
       setActiveMilestone(null)
       swingingRef.current = false
+      setHintSwinging(false)
     }, 600)
 
     return () => { stopSwing() }
@@ -398,7 +407,9 @@ export default function TrackingHome() {
   const liveDay = interpolateDay(handlePosition)
   // Hero continuously blends between the two frames the handle sits between —
   // driven by the CONTINUOUS position (not rounded liveDay) so it never snaps.
-  const blend = frameBlend(dayFromPosition(handlePosition))
+  // During the one-time swing hint the face is pinned to day 142 (the handle
+  // still swings to advertise draggability); normal blending resumes after.
+  const blend = hintSwinging ? frameBlend(142) : frameBlend(dayFromPosition(handlePosition))
   const c1      = card1Data(activeCP, liveDay)
   const c2Text  = card2Text(activeCP, activeMilestone)
   // Day counter sits inside the capsule once the fill is wide enough to hold it.

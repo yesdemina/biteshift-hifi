@@ -28,7 +28,10 @@
       "Bash(git commit -m 'scan animation, scan result chips/rings, tooth detail zoom+color, centered headlines, gray showcase bg *)",
       "Bash(git commit -m 'scan animation, scan result chips/rings, tooth detail zoom+color, centered headlines + click-through fix, gray showcase background *)",
       "Bash(curl -s -o /dev/null -w \"ROOT:%{http_code}\\\\n\" http://localhost:3000/)",
-      "Bash(curl -s -o /dev/null -w \"STYLEGUIDE:%{http_code}\\\\n\" http://localhost:3000/styleguide)"
+      "Bash(curl -s -o /dev/null -w \"STYLEGUIDE:%{http_code}\\\\n\" http://localhost:3000/styleguide)",
+      "Bash(curl -s -o /dev/null -w \"ROOT:%{http_code} SG:\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/styleguide)",
+      "Bash(git commit *)"
     ]
   }
 }

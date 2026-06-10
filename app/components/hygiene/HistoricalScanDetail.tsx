@@ -98,7 +98,7 @@ export default function HistoricalScanDetail({ scan, onBack }: HistoricalScanDet
       </div>
 
       {/* Headline */}
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', lineHeight: 1.2, letterSpacing: '-0.4px', textAlign: 'center' }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#000000', padding: '12px 24px 0', lineHeight: 1.15, letterSpacing: '-0.4px', textAlign: 'center' }}>
         scan from {scan.date.toLowerCase()}
       </h1>
 
@@ -164,7 +164,7 @@ export default function HistoricalScanDetail({ scan, onBack }: HistoricalScanDet
           >
             INSIGHT
           </div>
-          <p style={{ position: 'relative', fontSize: 13, color: '#000000', lineHeight: 1.45 }}>
+          <p style={{ position: 'relative', fontSize: 13, color: '#000000', lineHeight: 1.3 }}>
             at the time: {hygieneData.insight.toLowerCase()}
           </p>
         </div>

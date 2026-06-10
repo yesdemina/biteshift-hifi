@@ -48,7 +48,7 @@ function InfoCard({ tag, text, bg }: { tag: string; text: string; bg: string }) 
       >
         {tag}
       </span>
-      <span style={{ fontSize: 13, color: '#000000', lineHeight: 1.4 }}>{text}</span>
+      <span style={{ fontSize: 13, color: '#000000', lineHeight: 1.3 }}>{text}</span>
     </div>
   )
 }

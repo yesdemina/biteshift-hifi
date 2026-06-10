@@ -39,7 +39,7 @@ export default function HatchedPlaceholder({
           color: '#AAAAAA',
           textAlign: 'center',
           padding: '0 20px',
-          lineHeight: 1.4,
+          lineHeight: 1.3,
           fontStyle: 'italic',
         }}
       >

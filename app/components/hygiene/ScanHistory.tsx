@@ -56,7 +56,7 @@ function HistoryRow({ entry, onSelect }: { entry: ScanHistoryEntry; onSelect: ()
       <div style={{ minWidth: 80, flexShrink: 0 }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: '#000000' }}>{entry.date}</div>
       </div>
-      <div style={{ flex: 1, fontSize: 11, color: '#999999', lineHeight: 1.35 }}>
+      <div style={{ flex: 1, fontSize: 11, color: '#999999', lineHeight: 1.3 }}>
         {entry.stats}
       </div>
       <StatusDot type={entry.dotType} />

@@ -119,7 +119,7 @@ export default function HygieneHome({ onStartScan, onViewHistory }: HygieneHomeP
         </div>
 
         {/* Microcopy */}
-        <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: '#999999', lineHeight: 1.5 }}>
+        <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: '#999999', lineHeight: 1.3 }}>
           {hasScans ? (
             <>
               <div>grab your scanner</div>
