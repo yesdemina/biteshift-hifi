@@ -146,7 +146,7 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
               style={{
                 background: '#000000',
                 border: 'none',
-                borderRadius: 999,
+                borderRadius: 12,
                 padding: '7px 14px',
                 fontSize: 12,
                 color: '#FFFFFF',
