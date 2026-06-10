@@ -37,7 +37,9 @@
       "Bash(curl -s -o /dev/null -w \"/styleguide HTTP %{http_code}\\\\n\" http://localhost:3000/styleguide)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(curl -s http://localhost:3000/)",
-      "mcp__Claude_in_Chrome__tabs_context_mcp"
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(curl -s -o /dev/null -w \"/ %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/styleguide %{http_code}\\\\n\" http://localhost:3000/styleguide)"
     ]
   }
 }
