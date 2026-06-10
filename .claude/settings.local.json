@@ -31,7 +31,13 @@
       "Bash(curl -s -o /dev/null -w \"STYLEGUIDE:%{http_code}\\\\n\" http://localhost:3000/styleguide)",
       "Bash(curl -s -o /dev/null -w \"ROOT:%{http_code} SG:\" http://localhost:3000/)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/styleguide)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/ HTTP %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/styleguide HTTP %{http_code}\\\\n\" http://localhost:3000/styleguide)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
     ]
   }
 }

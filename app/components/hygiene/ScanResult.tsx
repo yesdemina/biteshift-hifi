@@ -308,8 +308,10 @@ export default function ScanResult({ onBack, onToothDetail }: ScanResultProps) {
         <DetectedCard value={String(gumCare)} subtext="gum inflamed" valueColor="#9AD2D2" />
       </div>
 
-      {/* INSIGHT — hugs its content (no fixed slot, unlike Tracking) */}
-      <div style={{ padding: '16px 16px 0' }}>
+      {/* INSIGHT — hugs its content (no fixed slot, unlike Tracking). Top gap is
+          the standard 10px card gap, so the vertical gap to INSIGHT equals the
+          horizontal gap between the two cards above (both 10). */}
+      <div style={{ padding: '10px 16px 0' }}>
         <div
           style={{
             background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',

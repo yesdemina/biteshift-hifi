@@ -260,14 +260,26 @@ function MilestoneCard({ text }: { text: string }) {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function TrackingHome() {
+  // The REAL resting position is ALWAYS day 142 (TODAY ≈ 0.66). It drives the
+  // label, hero, drag, and the capsule fill at rest — so the screen always
+  // settles on 142, even if the one-time intro animation is interrupted.
   const [handlePosition, setHandlePosition]     = useState(0.66)
   const [activeCP, setActiveCP]                 = useState<CP>('today')
   const [activeMilestone, setActiveMilestone]   = useState<Milestone | null>(null)
   const [dragging, setDragging]                 = useState(false)
-  // True only while the one-time swing HINT is animating. During it the hero
-  // freezes on day 142 (the handle/fill still swing); normal drag blending
-  // resumes the moment it ends or the user grabs the handle.
-  const [hintSwinging, setHintSwinging]         = useState(false)
+  // True while a one-time intro animation (paint-in or swing HINT) is running.
+  // During the swing the hero freezes on day 142 (the handle still moves); normal
+  // drag blending resumes the moment it ends or the user grabs the handle.
+  const [hintSwinging, setHintSwinging]         = useState(!swingHintPlayed)
+  // Soft bloom that rides the leading edge of the fill during the intro paint-in,
+  // fading out once it settles. Only on the first-ever entry.
+  const [introGlow, setIntroGlow]               = useState(!swingHintPlayed)
+  // VISUAL-ONLY override for the intro paint-in: a separate fill value animated
+  // from 0 (empty) up to the resting position. While non-null it drives the fill
+  // width + leading-edge bloom; null hands the fill back to the real position
+  // (0.66 / day 142). Because the real handle/label/hero stay pinned at 142, the
+  // screen can never get stuck at 0 if the intro is interrupted.
+  const [introFill, setIntroFill]               = useState<number | null>(swingHintPlayed ? null : 0)
 
   const isDragging         = useRef(false)
   const debounceRef        = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -288,6 +300,10 @@ export default function TrackingHome() {
     swingTimeoutRef.current = null
     swingingRef.current = false
     setHintSwinging(false)
+    setIntroGlow(false)
+    // Hand the fill back to the real position (0.66 / day 142) — never leave it
+    // stuck at the intro's start value if the animation is interrupted.
+    setIntroFill(null)
   }
 
   const scheduleUpdate = () => {
@@ -342,8 +358,13 @@ export default function TrackingHome() {
   // ── One-time swing hint ─────────────────────────────────────────────────────
   useEffect(() => {
     if (swingHintPlayed) return
-    swingHintPlayed = true
     swingingRef.current = true
+    // (Re)initialise the intro's visual state for THIS run. Needed because a
+    // prior React-strict-mode mount's cleanup may have reset these — the second
+    // mount must restart cleanly. The REAL position stays 0.66 (day 142).
+    setIntroFill(0)
+    setIntroGlow(true)
+    setHintSwinging(true)
 
     const tween = (from: number, to: number, dur: number, ease: (t: number) => number) =>
       new Promise<void>((resolve) => {
@@ -359,10 +380,37 @@ export default function TrackingHome() {
         swingRafRef.current = requestAnimationFrame(step)
       })
 
+    // Visual-only tween for the intro paint-in: animates introFill WITHOUT
+    // touching the real position, so the handle/label/hero stay pinned at 142.
+    const tweenFill = (from: number, to: number, dur: number, ease: (t: number) => number) =>
+      new Promise<void>((resolve) => {
+        const start = performance.now()
+        const step = (now: number) => {
+          const t = Math.min(1, (now - start) / dur)
+          setIntroFill(from + (to - from) * ease(t))
+          if (t < 1) swingRafRef.current = requestAnimationFrame(step)
+          else resolve()
+        }
+        swingRafRef.current = requestAnimationFrame(step)
+      })
+
     swingTimeoutRef.current = setTimeout(async () => {
-      // Freeze the hero on day 142 for the duration of the hint — only the
-      // handle/fill should swing, not the face. Eased glides, gentle amplitude.
-      setHintSwinging(true)
+      // Mark the hint played ONLY now, as the animation actually begins — this is
+      // after any strict-mode mount→cleanup→mount window (the cleanup clears this
+      // timeout before it fires), so the surviving mount still runs the full
+      // sequence instead of being skipped by an already-set flag.
+      swingHintPlayed = true
+      // 1. INTRO FILL — the fill paints in from empty (0) up to the day-142
+      //    position. Visual only: the real position is already 0.66, so the label
+      //    + hero read "142" the whole time and the fill flows up to meet them.
+      await tweenFill(0, 0.66, 900, easeOut)
+      if (!swingingRef.current) return
+      // Paint has settled — hand the fill back to the real position (rests at 142)
+      // and fade the leading-edge bloom out.
+      setIntroFill(null)
+      setIntroGlow(false)
+      // 2. Gentle one-time swing hint to advertise draggability. Eased glides,
+      //    gentle amplitude; hero stays frozen on day 142.
       await tween(0.66, 0.72, 600, easeInOut)
       if (!swingingRef.current) return
       await tween(0.72, 0.60, 900, easeInOut)
@@ -375,7 +423,7 @@ export default function TrackingHome() {
       setActiveMilestone(null)
       swingingRef.current = false
       setHintSwinging(false)
-    }, 600)
+    }, 300)
 
     return () => { stopSwing() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -405,6 +453,10 @@ export default function TrackingHome() {
   }, [])
 
   const liveDay = interpolateDay(handlePosition)
+  // Visual fill position: the intro paint-in override when active, otherwise the
+  // real handle position. Drives ONLY the capsule fill width + leading-edge bloom
+  // (the label, hero, and drag all use the real handlePosition → always 142 rest).
+  const fillPos = introFill ?? handlePosition
   // Hero continuously blends between the two frames the handle sits between —
   // driven by the CONTINUOUS position (not rounded liveDay) so it never snaps.
   // During the one-time swing hint the face is pinned to day 142 (the handle
@@ -556,8 +608,16 @@ export default function TrackingHome() {
               top: 0,
               left: 0,
               bottom: 0,
-              width: `${handlePosition * 100}%`,
-              background: 'linear-gradient(90deg, #FFB3D1 0%, #E0C8FF 100%)',
+              width: `${fillPos * 100}%`,
+              // Same full-iridescent gradient as the INSIGHT card, but ANCHORED to
+              // the full capsule width (390 − 2×24px gutter = 342px) and pinned at
+              // the left. Growing the fill REVEALS this fixed gradient left→right
+              // rather than rescaling it, so the color at the handle tracks true
+              // progress (≈50% = lavender; mint only appears near the far right).
+              background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',
+              backgroundSize: '342px 100%',
+              backgroundPosition: 'left center',
+              backgroundRepeat: 'no-repeat',
               borderRadius: 999,
               // Right-edge inset shadow doubles as the "drag me" hint now that
               // the chevrons are gone.
@@ -567,10 +627,32 @@ export default function TrackingHome() {
             }}
           />
 
-          {/* Day counter — rides the fill's right edge. Sits just outside the
+          {/* Leading-edge bloom — a soft bright bloom that rides the paint front
+              during the one-time intro fill, then fades out as it settles, so the
+              fill reads as flowing liquid rather than a hard bar. Intro only. */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: -4,
+              bottom: -4,
+              left: `calc(${fillPos * 100}% - 16px)`,
+              width: 32,
+              borderRadius: 999,
+              background:
+                'radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0) 72%)',
+              filter: 'blur(3px)',
+              opacity: introGlow ? 1 : 0,
+              transition: 'opacity 450ms ease-out',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Day counter — travels WITH the handle/fill edge. Sits just outside the
               fill on white while it's short (≤ day 70), then tucks inside the
               fill near its right edge once there's room (≥ day 71). Clamped so
-              it never runs off either end of the capsule. */}
+              it never runs off either end of the capsule. "day" and the number
+              share a baseline (bottom-aligned); the number stays larger. */}
           <div
             aria-hidden
             style={{

@@ -436,6 +436,29 @@ export default function StyleGuide() {
                 <SpacingRow key={s.token} token={s.token} px={s.px} role={s.role} />
               ))}
             </div>
+
+            {/* Card-gap token — the standard gap BETWEEN cards (both directions). */}
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', color: '#999999', textTransform: 'uppercase', marginBottom: 14 }}>
+                card gap
+              </div>
+              {/* Mini demo — two cards with the gap between them = the gap below them */}
+              <div style={{ maxWidth: 260 }}>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <div style={{ flex: 1, height: 40, background: '#FFFFFF', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '2px 2px 6px rgba(0,0,0,0.06)' }} />
+                  <div style={{ flex: 1, height: 40, background: '#FFFFFF', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '2px 2px 6px rgba(0,0,0,0.06)' }} />
+                </div>
+                <div style={{ height: 40, marginTop: 10, background: '#FFFFFF', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 12, boxShadow: '2px 2px 6px rgba(0,0,0,0.06)' }} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 16 }}>
+                <div style={{ width: 90, flexShrink: 0, fontSize: 13, color: '#000000' }}>card gap</div>
+                <div style={{ width: 48, flexShrink: 0, fontSize: 13, color: '#999999' }}>10px</div>
+                <div style={{ fontSize: 12, color: '#999999' }}>
+                  equal gap between cards — horizontal (between side-by-side cards) and
+                  vertical (card row → INSIGHT). same value both ways.
+                </div>
+              </div>
+            </div>
           </Section>
 
           {/* 5. RADIUS */}
