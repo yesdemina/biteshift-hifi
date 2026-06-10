@@ -87,6 +87,8 @@ export default function SupportHome({ userName, onProfile }: SupportHomeProps) {
             color: '#000000',
             letterSpacing: '-0.4px',
             margin: 0,
+            // Full-width overlay sits over the avatar; let taps pass through to it.
+            pointerEvents: 'none',
           }}
         >
           {greeting}
