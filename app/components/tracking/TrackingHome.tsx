@@ -271,9 +271,6 @@ export default function TrackingHome() {
   // During the swing the hero freezes on day 142 (the handle still moves); normal
   // drag blending resumes the moment it ends or the user grabs the handle.
   const [hintSwinging, setHintSwinging]         = useState(!swingHintPlayed)
-  // Soft bloom that rides the leading edge of the fill during the intro paint-in,
-  // fading out once it settles. Only on the first-ever entry.
-  const [introGlow, setIntroGlow]               = useState(!swingHintPlayed)
   // VISUAL-ONLY override for the intro paint-in: a separate fill value animated
   // from 0 (empty) up to the resting position. While non-null it drives the fill
   // width + leading-edge bloom; null hands the fill back to the real position
@@ -300,7 +297,6 @@ export default function TrackingHome() {
     swingTimeoutRef.current = null
     swingingRef.current = false
     setHintSwinging(false)
-    setIntroGlow(false)
     // Hand the fill back to the real position (0.66 / day 142) — never leave it
     // stuck at the intro's start value if the animation is interrupted.
     setIntroFill(null)
@@ -358,12 +354,19 @@ export default function TrackingHome() {
   // ── One-time swing hint ─────────────────────────────────────────────────────
   useEffect(() => {
     if (swingHintPlayed) return
+    // Respect reduced-motion: skip the intro paint-in + swing entirely and snap
+    // straight to the final state (full fill to day 142, hero un-frozen).
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      swingHintPlayed = true
+      setIntroFill(null)
+      setHintSwinging(false)
+      return
+    }
     swingingRef.current = true
     // (Re)initialise the intro's visual state for THIS run. Needed because a
     // prior React-strict-mode mount's cleanup may have reset these — the second
     // mount must restart cleanly. The REAL position stays 0.66 (day 142).
     setIntroFill(0)
-    setIntroGlow(true)
     setHintSwinging(true)
 
     const tween = (from: number, to: number, dur: number, ease: (t: number) => number) =>
@@ -405,10 +408,8 @@ export default function TrackingHome() {
       //    + hero read "142" the whole time and the fill flows up to meet them.
       await tweenFill(0, 0.66, 900, easeOut)
       if (!swingingRef.current) return
-      // Paint has settled — hand the fill back to the real position (rests at 142)
-      // and fade the leading-edge bloom out.
+      // Paint has settled — hand the fill back to the real position (rests at 142).
       setIntroFill(null)
-      setIntroGlow(false)
       // 2. Gentle one-time swing hint to advertise draggability. Eased glides,
       //    gentle amplitude; hero stays frozen on day 142.
       await tween(0.66, 0.72, 600, easeInOut)
@@ -601,49 +602,48 @@ export default function TrackingHome() {
             setDragging(false)
           }}
         >
-          {/* Vivid iridescent fill — clipped to the capsule's rounded edges */}
+          {/* TRACK — a faint (0.18) full-capsule-width tint of the SAME gradient,
+              always visible underneath. So the UNFILLED part of the capsule is a
+              soft pastel wash of the gradient, never white. */}
           <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 999,
+              background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',
+              opacity: 0.18,
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* PROGRESS — the SAME gradient at full opacity, ANCHORED to the full
+              capsule width (background-size = capsule width, position fixed) and
+              revealed by clipping THIS div's width to the handle's continuous
+              position. Growing it exposes later stops of the FIXED gradient, so the
+              fill edge is ~lavender at ~50% and mint at the end — never white. The
+              right edge is crisp (the div boundary + a ≤3px depth shadow). */}
+          <div
+            className="bs-capsule-fill"
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               bottom: 0,
               width: `${fillPos * 100}%`,
-              // Same full-iridescent gradient as the INSIGHT card, but ANCHORED to
-              // the full capsule width (390 − 2×24px gutter = 342px) and pinned at
-              // the left. Growing the fill REVEALS this fixed gradient left→right
-              // rather than rescaling it, so the color at the handle tracks true
-              // progress (≈50% = lavender; mint only appears near the far right).
               background: 'linear-gradient(135deg, #FFB3D1 0%, #E0C8FF 50%, #C8E0E0 100%)',
               backgroundSize: '342px 100%',
               backgroundPosition: 'left center',
               backgroundRepeat: 'no-repeat',
               borderRadius: 999,
-              // Right-edge inset shadow doubles as the "drag me" hint now that
-              // the chevrons are gone.
+              // While dragging, ease the progress width (cubic-bezier ~200ms) so it
+              // glides without blink; off otherwise so the RAF intro/swing stay
+              // exact. Disabled under prefers-reduced-motion via globals.css (snap).
+              transition: dragging ? 'width 200ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
+              // Embossed top/bottom highlight + a CRISP ≤3px right-edge depth (the
+              // old 8px wash that read as a soft fade is gone).
               boxShadow:
-                'inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05), inset -4px 0 8px rgba(0,0,0,0.08)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Leading-edge bloom — a soft bright bloom that rides the paint front
-              during the one-time intro fill, then fades out as it settles, so the
-              fill reads as flowing liquid rather than a hard bar. Intro only. */}
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: -4,
-              bottom: -4,
-              left: `calc(${fillPos * 100}% - 16px)`,
-              width: 32,
-              borderRadius: 999,
-              background:
-                'radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0) 72%)',
-              filter: 'blur(3px)',
-              opacity: introGlow ? 1 : 0,
-              transition: 'opacity 450ms ease-out',
+                'inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05), inset -2px 0 3px rgba(0,0,0,0.07)',
               pointerEvents: 'none',
             }}
           />
@@ -658,6 +658,7 @@ export default function TrackingHome() {
             style={{
               position: 'absolute',
               top: '50%',
+              zIndex: 2,
               ...(dayPinLeft
                 ? { left: 16, transform: 'translateY(-50%)' }
                 : dayPinRight

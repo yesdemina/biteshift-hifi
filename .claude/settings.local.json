@@ -40,7 +40,11 @@
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "Bash(curl -s -o /dev/null -w \"/ %{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(curl -s -o /dev/null -w \"/styleguide %{http_code}\\\\n\" http://localhost:3000/styleguide)",
-      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/app_globals_0jn8.0u.css\")"
+      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/app_globals_0jn8.0u.css\")",
+      "Bash(curl -s -H 'Cache-Control: no-cache' \"http://localhost:3000/?t=$\\(date +%s\\)\")",
+      "Bash(curl -s -o /dev/null -w \"page %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"page %{http_code}\\\\n\" \"http://localhost:3000/\")",
+      "Bash(curl -s http://localhost:3000/_next/static/chunks/app_globals_0jn8.0u.css)"
     ]
   }
 }

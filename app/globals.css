@@ -242,6 +242,15 @@ body {
   animation: cpFade 200ms ease-out;
 }
 
+/* Tracking capsule progress fill (.bs-capsule-fill) — a gradient anchored to the
+   FULL capsule width, revealed by clipping the element's width to the handle's
+   position (set inline in TrackingHome.tsx). Respect reduced-motion: drop the
+   eased drag transition so the fill snaps to its final width (no motion). The
+   intro paint-in is also skipped in JS under reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+  .bs-capsule-fill { transition: none !important; }
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    MOBILE full-screen reflow (≤600px) — the app was built for a fixed 390×844
    frame; on a real phone it must reflow to the live viewport. These rules use
@@ -288,3 +297,10 @@ body {
     height: 100% !important;
   }
 }
+
+
+
+
+
+
+
